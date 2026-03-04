@@ -1,0 +1,42 @@
+version: '3.8'
+
+# This is for local development with Docker
+# It overrides the production docker-compose.yml for easier local testing
+
+services:
+  postgres:
+    # For local development, you can change the image to use a specific version
+    # Or add pgAdmin for easier database management
+    environment:
+      POSTGRES_DB: crm_db_local
+      POSTGRES_USER: crm_user_dev
+      POSTGRES_PASSWORD: password123
+
+  crm-app:
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://crm_user_dev:password123@postgres:5432/crm_db_local
+      NEXTAUTH_SECRET: dev-secret-key-not-secure
+      NEXTAUTH_URL: http://localhost:3000
+    # For development, you might want to use a volume for code hot-reloading
+    # Uncomment the following section if you need it:
+    # volumes:
+    #   - .:/app
+    #   - /app/node_modules
+    #   - /app/.next
+    command: sh -c "npm run prisma:migrate && npm run dev"
+    ports:
+      - "3000:3000" # This makes the port accessible from your host
+
+  # Optional: pgAdmin for database GUI (local development only)
+  # pgadmin:
+  #   image: dpage/pgadmin4:latest
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: admin@example.com
+  #     PGADMIN_DEFAULT_PASSWORD: admin
+  #   ports:
+  #     - "5050:80"
+  #   networks:
+  #     - crm-network
+  #   depends_on:
+  #     - postgres

@@ -1,0 +1,189 @@
+{
+  "branding": {
+    "colorScheme": "light",
+    "fonts": [
+      {
+        "family": "Josefin Sans",
+        "role": "unknown"
+      }
+    ],
+    "colors": {
+      "primary": "#1B6C98",
+      "accent": "#1B6C98",
+      "background": "#FFFFFF",
+      "textPrimary": "#020817",
+      "link": "#020817"
+    },
+    "typography": {
+      "fontFamilies": {
+        "primary": "Josefin Sans",
+        "heading": "Josefin Sans"
+      },
+      "fontStacks": {
+        "heading": [
+          "Josefin Sans"
+        ],
+        "body": [
+          "Josefin Sans"
+        ],
+        "paragraph": [
+          "Josefin Sans"
+        ]
+      },
+      "fontSizes": {
+        "h1": "60px",
+        "h2": "48px",
+        "body": "20px"
+      }
+    },
+    "spacing": {
+      "baseUnit": 4,
+      "borderRadius": "6px"
+    },
+    "components": {
+      "input": {
+        "background": "transparent",
+        "textColor": "#020817",
+        "borderColor": "#D1D5DB",
+        "borderRadius": "8px",
+        "borderRadiusCorners": {
+          "topLeft": "8px",
+          "topRight": "8px",
+          "bottomRight": "8px",
+          "bottomLeft": "8px"
+        },
+        "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px"
+      },
+      "buttonPrimary": {
+        "background": "#1B6C98",
+        "textColor": "#FFFFFF",
+        "borderRadius": "6px",
+        "borderRadiusCorners": {
+          "topLeft": "6px",
+          "topRight": "6px",
+          "bottomRight": "6px",
+          "bottomLeft": "6px"
+        },
+        "shadow": "none"
+      },
+      "buttonSecondary": {
+        "background": "#F9FAFB",
+        "textColor": "#FFFFFF",
+        "borderRadius": "8px",
+        "borderRadiusCorners": {
+          "topLeft": "8px",
+          "topRight": "8px",
+          "bottomRight": "8px",
+          "bottomLeft": "8px"
+        },
+        "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px"
+      }
+    },
+    "images": {
+      "favicon": "https://mavoid.com/Logo.png",
+      "ogImage": null
+    },
+    "__llm_logo_reasoning": {
+      "selectedIndex": -1,
+      "reasoning": "No suitable logo candidate was found. The provided candidate is tiny and lacks clear branding elements.",
+      "confidence": 0.3,
+      "rejected": true,
+      "source": "llm"
+    },
+    "__llm_button_reasoning": {
+      "primary": {
+        "index": 2,
+        "text": "Accept",
+        "reasoning": "Button #2 has a vibrant brand color background (#1B6C98) and action-oriented text ('Accept'), making it the primary CTA."
+      },
+      "secondary": {
+        "index": 0,
+        "text": "Send Message",
+        "reasoning": "Button #0 has a different background color (#F9FAFB) and a supportive action ('Send Message'), suitable as a secondary CTA."
+      },
+      "confidence": 0.95
+    },
+    "personality": {
+      "tone": "professional",
+      "energy": "medium",
+      "targetAudience": "businesses seeking digital growth solutions"
+    },
+    "designSystem": {
+      "framework": "tailwind",
+      "componentLibrary": ""
+    },
+    "confidence": {
+      "buttons": 0.95,
+      "colors": 0.9,
+      "overall": 0.925
+    },
+    "__llm_metadata": {
+      "logoSelection": {
+        "llmCalled": true,
+        "llmSucceeded": true,
+        "finalSource": "llm",
+        "rawLogoSelection": {
+          "selectedLogoIndex": -1,
+          "selectedLogoReasoning": "No suitable logo candidate was found. The provided candidate is tiny and lacks clear branding elements.",
+          "confidence": 0.3
+        }
+      },
+      "buttonClassification": {
+        "llmCalled": true,
+        "llmSucceeded": true
+      }
+    }
+  },
+  "metadata": {
+    "viewport": "width=device-width, initial-scale=1",
+    "title": "MaVoid | Digital Growth & Creative Solutions",
+    "language": "en",
+    "description": "MaVoid empowers your business with modern digital experiences — from UI/UX to performance-driven web development.",
+    "next-size-adjust": "",
+    "favicon": "https://mavoid.com/Logo.png",
+    "scrapeId": "019caaae-0811-7298-b3eb-27f31676f72d",
+    "sourceURL": "https://mavoid.com",
+    "url": "https://mavoid.com/",
+    "statusCode": 200,
+    "contentType": "text/html; charset=utf-8",
+    "timezone": "America/New_York",
+    "proxyUsed": "basic",
+    "indexId": "a626eb46-a169-45ce-85dd-55659e24ed4d",
+    "creditsUsed": 1,
+    "concurrencyLimited": false
+  },
+  "links": [
+    "https://mavoid.com/",
+    "https://mavoid.com/#",
+    "https://mavoid.com/mup-platform",
+    "https://mavoid.com/auth/signup",
+    "https://mavoid.com/services",
+    "https://mavoid.com/#who-we-are",
+    "https://mavoid.com/privacy",
+    "https://mavoid.com/about",
+    "https://mavoid.com/#contact",
+    "https://maps.google.com/maps?ll=31.198777,29.905245&z=15&t=m&hl=en&gl=EG&mapclient=embed&cid=14416741209618717752",
+    "https://www.google.com/intl/en_EG/help/terms_maps.html",
+    "https://www.google.com/maps/@31.1987774,29.9052454,15z/data=!10m1!1e1!12b1?source=apiv3&rapsrc=apiv3",
+    "https://www.facebook.com/profile.php?id=61567021770630",
+    "https://x.com/ma_v0id",
+    "https://www.linkedin.com/company/mavoid/posts/?feedView=all",
+    "https://www.instagram.com/ma_v0id/",
+    "https://www.tiktok.com/@ma_void",
+    "https://mavoid.com/services/custom-software-development",
+    "https://mavoid.com/services/mobile-app-development",
+    "https://mavoid.com/services/website-development",
+    "https://mavoid.com/services/social-media-management",
+    "https://mavoid.com/services/it-consultations",
+    "https://mavoid.com/products/e-commerce",
+    "https://mavoid.com/products/restaurant-management",
+    "https://mavoid.com/products/clinic-management",
+    "https://mavoid.com/products/mavoid-unified-platform",
+    "https://mavoid.com/products/ai-automations",
+    "https://mavoid.com/products/mavoid-hosting",
+    "https://mavoid.com/terms-and-conditions",
+    "https://mavoid.com/refund",
+    "tel:01500800591",
+    "mailto:info@mavoid.com"
+  ]
+}

@@ -1,0 +1,238 @@
+@import "tailwindcss";
+
+:root {
+  --color-primary: #1B6C98;
+  --color-primary-hover: #155a80;
+  --color-primary-light: #e8f3f9;
+  --color-bg: #FFFFFF;
+  --color-surface: #F9FAFB;
+  --color-border: #D1D5DB;
+  --color-text: #020817;
+  --color-text-muted: #6B7280;
+  --color-text-subtle: #9CA3AF;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --shadow-input: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Josefin Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-size: 15px;
+  letter-spacing: 0.01em;
+}
+
+/* ── Header ── */
+.mv-header {
+  background: #fff;
+  border-bottom: 1px solid var(--color-border);
+  padding: 0 24px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+.mv-header-inner {
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ── Logo ── */
+.mv-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.mv-logo img {
+  height: 32px;
+  width: auto;
+}
+
+.mv-logo-word {
+  font-family: 'Josefin Sans', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.12em;
+  color: var(--color-primary);
+  text-transform: uppercase;
+}
+
+.mv-logo-sub {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* ── Nav ── */
+.mv-back {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.15s;
+}
+
+.mv-back:hover {
+  color: var(--color-primary);
+}
+
+.mv-page-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Buttons ── */
+.mv-btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 9px 20px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+  white-space: nowrap;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mv-btn-primary:hover {
+  background: var(--color-primary-hover);
+}
+
+.mv-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mv-btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 9px 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.mv-btn-secondary:hover {
+  background: #f0f0f0;
+  color: var(--color-text);
+}
+
+/* ── Inputs ── */
+.mv-input,
+.mv-textarea {
+  width: 100%;
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 14px;
+  box-shadow: var(--shadow-input);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.mv-input::placeholder,
+.mv-textarea::placeholder {
+  color: var(--color-text-subtle);
+}
+
+.mv-input:focus,
+.mv-textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(27, 108, 152, 0.15);
+}
+
+.mv-textarea {
+  resize: none;
+}
+
+/* ── Labels ── */
+.mv-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+/* ── Card ── */
+.mv-card {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 24px;
+}
+
+/* ── Alert ── */
+.mv-alert-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+}
+
+/* ── Badge ── */
+.mv-badge {
+  display: inline-block;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 99px;
+}
+
+/* ── Divider ── */
+.mv-divider {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 0;
+}

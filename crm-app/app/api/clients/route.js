@@ -9,8 +9,8 @@ export async function GET(request) {
             where: search
                 ? {
                     OR: [
-                        { fullName: { contains: search, mode: 'insensitive' } },
-                        { phoneNumber: { contains: search, mode: 'insensitive' } },
+                        { fullName: { contains: search } },
+                        { phoneNumber: { contains: search } },
                     ],
                 }
                 : undefined,

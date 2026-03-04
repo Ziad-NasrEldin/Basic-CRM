@@ -22,7 +22,7 @@ export async function POST(request) {
         }
 
         const existing = await prisma.product.findFirst({
-            where: { name: { equals: name.trim(), mode: 'insensitive' } },
+            where: { name: name.trim() },
         });
         if (existing) {
             return Response.json({ error: 'A product with this name already exists' }, { status: 409 });

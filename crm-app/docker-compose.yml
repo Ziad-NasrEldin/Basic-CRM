@@ -35,8 +35,6 @@ services:
       - "3092:3000"
     networks:
       - crm-network
-    volumes:
-      - ./prisma/migrations:/app/prisma/migrations
     command: sh -c "npm run prisma:migrate && npm start"
 
 volumes:

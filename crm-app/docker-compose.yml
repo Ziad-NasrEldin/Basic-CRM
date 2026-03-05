@@ -32,9 +32,9 @@ services:
       NODE_ENV: production
       DATABASE_URL: postgresql://${DB_USER:-crm_user}:${DB_PASSWORD:-changeme_secure_password}@postgres:5432/${DB_NAME:-crm_db}
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-}
-      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3092}
     ports:
-      - "3000:3000"
+      - "3092:3000"
     networks:
       - crm-network
     volumes:

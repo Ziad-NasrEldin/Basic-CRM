@@ -1,97 +1,50 @@
-# Nginx Configuration for CRM App
-# VPS-ready (RHEL/CentOS style): place at /etc/nginx/conf.d/crm.mavoid.com.conf
-# Debian/Ubuntu alternative: /etc/nginx/sites-available/crm.mavoid.com + symlink to sites-enabled
-# IMPORTANT: keep this file HTTP-only before first certificate issuance.
-# Then run: certbot --nginx -d crm.mavoid.com
-# Certbot will create/manage the HTTPS SSL directives automatically.
+version: '3.8'
 
-# HTTP server block (SSL handled separately by Certbot on the VPS)
-server {
-    listen 80;
-    listen [::]:80;
-    server_name crm.mavoid.com;
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: crm-app-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-crm_db}
+      POSTGRES_USER: ${DB_USER:-crm_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-crm1234}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - crm-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-crm_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-    # Security Headers
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header X-XSS-Protection "1; mode=block" always;
-    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+  crm-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: crm-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${DB_USER:-crm_user}:${DB_PASSWORD:-crm1234}@postgres:5432/${DB_NAME:-crm_db}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3092}
+    ports:
+      - "3092:3000"
+    networks:
+      - crm-network
+    volumes:
+      - ./prisma/migrations:/app/prisma/migrations
+    command: sh -c "npm run prisma:migrate && npm start"
 
-    # Compression
-    gzip on;
-    gzip_vary on;
-    gzip_proxied any;
-    gzip_comp_level 6;
-    gzip_types text/plain text/css text/xml text/javascript application/json application/javascript application/xml+rss application/atom+xml image/svg+xml;
+volumes:
+  postgres_data:
+    driver: local
 
-    # Client body size limit
-    client_max_body_size 50M;
-
-    # Proxy settings for Docker container
-    location / {
-        proxy_pass http://localhost:3092;
-        proxy_http_version 1.1;
-        
-        # Required headers for WebSocket and upgrades
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        
-        # Forward original request headers
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host $server_name;
-        proxy_set_header X-Forwarded-Port $server_port;
-        
-        # Timeouts
-        proxy_connect_timeout 60s;
-        proxy_send_timeout 60s;
-        proxy_read_timeout 60s;
-        
-        # Buffering
-        proxy_buffering on;
-        proxy_buffer_size 4k;
-        proxy_buffers 8 4k;
-    }
-
-    # Static files caching
-    location ~* ^/(_next|public)/(.*)\.(js|css|png|jpg|jpeg|gif|ico|svg|webp|woff|woff2|ttf|eot)$ {
-        proxy_pass http://localhost:3092;
-        proxy_cache_valid 200 60d;
-        proxy_cache_bypass $http_pragma $http_authorization;
-        add_header Cache-Control "public, max-age=31536000, immutable";
-    }
-
-    # API routes caching
-    location /api/ {
-        proxy_pass http://localhost:3092;
-        proxy_http_version 1.1;
-        
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        
-        # Don't cache API responses
-        proxy_cache_bypass $http_pragma $http_authorization;
-    }
-
-    # Deny access to sensitive files
-    location ~ /\. {
-        deny all;
-        access_log off;
-        log_not_found off;
-    }
-
-    # Deny access to some files
-    location ~ ~$ {
-        deny all;
-        access_log off;
-        log_not_found off;
-    }
-
-    # Access and error logs
-    access_log /var/log/nginx/crm-app-access.log combined;
-    error_log /var/log/nginx/crm-app-error.log;
-}
+networks:
+  crm-network:
+    driver: bridge

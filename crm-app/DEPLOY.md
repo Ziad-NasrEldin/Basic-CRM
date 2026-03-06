@@ -1,15 +1,32 @@
 # Ubuntu VPS Deployment Guide
 
-## Prerequisites
+## Quick Start (with Docker)
 
-- Ubuntu 20.04+ VPS
-- Node.js 18+ installed
-- PostgreSQL installed and running
-- Git installed
+The easiest way to deploy the CRM is with **Docker Compose**. It includes automatic daily backups.
+
+```bash
+# 1. SSH to VPS
+ssh root@your-vps-ip
+
+# 2. Go to project directory
+cd /path/to/Basic-CRM/crm-app
+
+# 3. Start with backups included
+docker compose --profile production up -d
+
+# 4. Check status
+docker compose ps
+```
+
+That's it! The app runs on port **3092** (configured in docker-compose.yml).
+
+See [BACKUP.md](./BACKUP.md) for backup & restore instructions.
 
 ---
 
-## 1. Set Up PostgreSQL
+## Manual Deployment (Linux/Ubuntu)
+
+If you prefer not to use Docker:
 
 ```bash
 # Log in to postgres

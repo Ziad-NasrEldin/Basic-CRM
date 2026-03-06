@@ -37,8 +37,38 @@ services:
       - crm-network
     command: sh -c "npm run prisma:migrate && npm start"
 
+  # Daily backup service - keeps 30 days of backups
+  backup:
+    image: postgres:16-alpine
+    container_name: crm-app-backup
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_USER: ${DB_USER:-crm_user}
+      DB_NAME: ${DB_NAME:-crm_db}
+      PGPASSWORD: ${DB_PASSWORD:-crm1234}
+    volumes:
+      - backups:/backups
+      - ./scripts/backup-db.sh:/usr/local/bin/backup-db.sh
+    networks:
+      - crm-network
+    entrypoint: /bin/sh -c 'chmod +x /usr/local/bin/backup-db.sh && while true; do /usr/local/bin/backup-db.sh; sleep 86400; done'
+    profiles:
+      - production
+
 volumes:
+  # ⚠️  WARNING: NEVER use "docker compose down -v" or "docker volume rm crm-app_postgres_data"
+  # This volume contains ALL your production data. Use backups for maintenance operations.
+  # To safely restart: use "docker compose restart" or "docker compose up -d"
   postgres_data:
+    driver: local
+  
+  # Persistent backup volume - separate from postgres_data
+  # Backups are automatically created daily and stored here for 30 days
+  # Restore: docker compose exec postgres psql -U crm_user -d crm_db < /backups/crm_db_YYYYMMDD_HHMMSS.sql
+  backups:
     driver: local
 
 networks:

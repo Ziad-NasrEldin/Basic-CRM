@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useTranslation } from '@/lib/TranslationContext';
+import Navbar from '../components/Navbar';
 
 function formatDate(dateStr, locale = 'en-US') {
     return new Date(dateStr).toLocaleDateString(locale, {
@@ -121,22 +121,7 @@ export default function SettingsPage() {
 
     return (
         <div style={{ minHeight: '100vh', background: '#F9FAFB' }}>
-            <header className="mv-header">
-                <div className="mv-header-inner">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                        <Link href="/" className="mv-back">← {t.mainPage.title}</Link>
-                        <div style={{ width: 1, height: 20, background: 'var(--color-border)' }} />
-                        <span className="mv-page-title">{t.settings.title}</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-                        <Link href="/analytics" className="mv-back" style={{ fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.header.analytics}</Link>
-                        <Link href="/" className="mv-logo">
-                            <Image src="/mavoid-logo.png" alt="MaVoid" width={28} height={28} style={{ objectFit: 'contain' }} />
-                            <span className="mv-logo-word" style={{ fontSize: 15 }}>MaVoid</span>
-                        </Link>
-                    </div>
-                </div>
-            </header>
+            <Navbar />
 
             <main style={{ maxWidth: 720, margin: '0 auto', padding: '40px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
 

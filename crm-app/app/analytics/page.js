@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useTranslation } from '@/lib/TranslationContext';
+import Navbar from '../components/Navbar';
 
 export default function AnalyticsPage() {
     const { language, translations } = useTranslation();
@@ -56,22 +56,7 @@ export default function AnalyticsPage() {
 
     return (
         <div className="analytics-page">
-            <header className="mv-header">
-                <div className="mv-header-inner">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                        <Link href="/" className="mv-back">{t.mainPage.title}</Link>
-                        <div style={{ width: 1, height: 20, background: 'var(--color-border)' }} />
-                        <span className="mv-page-title">{t.analytics.title}</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-                        <Link href="/settings" className="mv-back" style={{ fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.header.settings}</Link>
-                        <Link href="/" className="mv-logo">
-                            <Image src="/mavoid-logo.png" alt="MaVoid" width={28} height={28} style={{ objectFit: 'contain' }} />
-                            <span className="mv-logo-word" style={{ fontSize: 15 }}>MaVoid</span>
-                        </Link>
-                    </div>
-                </div>
-            </header>
+            <Navbar />
 
             <main className="analytics-main">
                 <section className="analytics-overview">

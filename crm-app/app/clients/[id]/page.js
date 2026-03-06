@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useTranslation } from '@/lib/TranslationContext';
+import Navbar from '../../components/Navbar';
 
 function formatDateTime(dateStr, locale = 'en-US') {
     return new Date(dateStr).toLocaleString(locale, {
@@ -390,23 +390,7 @@ export default function ClientDetailPage() {
 
     return (
         <div className="cd-page-wrap">
-            <header className="mv-header">
-                <div className="mv-header-inner">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                        <Link href="/" className="mv-back">{t.mainPage.title}</Link>
-                        <div style={{ width: 1, height: 20, background: 'var(--color-border)' }} />
-                        <span className="mv-page-title">{language === 'ar' ? 'تفاصيل العميل' : 'Client Details'}</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-                        <Link href="/analytics" className="mv-back" style={{ fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.header.analytics}</Link>
-                        <Link href="/settings" className="mv-back" style={{ fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.header.settings}</Link>
-                        <Link href="/" className="mv-logo">
-                            <Image src="/mavoid-logo.png" alt="MaVoid" width={28} height={28} style={{ objectFit: 'contain' }} />
-                            <span className="mv-logo-word" style={{ fontSize: 15 }}>MaVoid</span>
-                        </Link>
-                    </div>
-                </div>
-            </header>
+            <Navbar />
 
             <main className="cd-main">
                 {editingDetails ? (

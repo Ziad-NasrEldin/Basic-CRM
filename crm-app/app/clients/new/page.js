@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useTranslation } from '@/lib/TranslationContext';
+import Navbar from '../../components/Navbar';
 
 export default function NewClientPage() {
     const router = useRouter();
@@ -59,23 +59,7 @@ export default function NewClientPage() {
 
     return (
         <div style={{ minHeight: '100vh', background: '#F9FAFB' }}>
-            {/* Header */}
-            <header className="mv-header">
-                <div className="mv-header-inner">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                        <Link href="/" className="mv-back">← {t.mainPage.title}</Link>
-                        <div style={{ width: 1, height: 20, background: 'var(--color-border)' }} />
-                        <span className="mv-page-title">{t.newClient.title}</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-                        <Link href="/settings" className="mv-back" style={{ fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.1em' }}>⚙️ {t.header.settings}</Link>
-                        <Link href="/" className="mv-logo">
-                            <Image src="/mavoid-logo.png" alt="MaVoid" width={28} height={28} style={{ objectFit: 'contain' }} />
-                            <span className="mv-logo-word" style={{ fontSize: 15 }}>MaVoid</span>
-                        </Link>
-                    </div>
-                </div>
-            </header>
+            <Navbar />
 
             <main style={{ maxWidth: 560, margin: '0 auto', padding: '40px 24px' }}>
                 {/* Section label */}

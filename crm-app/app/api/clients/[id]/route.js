@@ -59,11 +59,11 @@ export async function PATCH(request, { params }) {
         const client = await prisma.client.update({
             where: { id: clientId },
             data: updateData,
-                            payments: { orderBy: { paidAt: 'desc' } },
             include: {
                 product: true,
                 status: true,
                 notes: { orderBy: { createdAt: 'desc' } },
+                payments: { orderBy: { paidAt: 'desc' } },
                 tasks: {
                     orderBy: [
                         { completed: 'asc' },

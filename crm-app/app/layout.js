@@ -1,4 +1,5 @@
 import './globals.css';
+import { TranslationProvider } from '@/lib/TranslationContext';
 
 export const metadata = {
     title: 'MaVoid CRM',
@@ -17,7 +18,11 @@ export default function RootLayout({ children }) {
                     rel="stylesheet"
                 />
             </head>
-            <body>{children}</body>
+            <body>
+                <TranslationProvider>
+                    {children}
+                </TranslationProvider>
+            </body>
         </html>
     );
 }

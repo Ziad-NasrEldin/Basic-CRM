@@ -3,14 +3,19 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useTranslation } from '@/lib/TranslationContext';
 
-function formatDate(dateStr) {
-    return new Date(dateStr).toLocaleDateString('en-US', {
+function formatDate(dateStr, locale = 'en-US') {
+    return new Date(dateStr).toLocaleDateString(locale, {
         year: 'numeric', month: 'short', day: 'numeric',
     });
 }
 
 export default function SettingsPage() {
+    const { language, translations } = useTranslation();
+    const t = translations;
+    const locale = language === 'ar' ? 'ar-SA' : 'en-US';
+    
     const [products, setProducts] = useState([]);
     const [statuses, setStatuses] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -48,7 +53,7 @@ export default function SettingsPage() {
     async function handleAddProduct(e) {
         e.preventDefault();
         setProductError('');
-        if (!newProductName.trim()) { setProductError('Product name is required.'); return; }
+        if (!newProductName.trim()) { setProductError(t.settings.errors.creationFailed); return; }
 
         setSubmitting(true);
         try {
@@ -58,21 +63,21 @@ export default function SettingsPage() {
                 body: JSON.stringify({ name: newProductName }),
             });
             const data = await res.json();
-            if (!res.ok) { setProductError(data.error || 'Failed to add product.'); return; }
+            if (!res.ok) { setProductError(data.error || t.settings.errors.creationFailed); return; }
             setNewProductName('');
             fetchProducts();
         } catch {
-            setProductError('Something went wrong. Please try again.');
+            setProductError(t.common.error + '. ' + (language === 'ar' ? 'يرجى المحاولة مجددا.' : 'Please try again.'));
         } finally {
             setSubmitting(false);
         }
     }
 
     async function handleDeleteProduct(id) {
-        if (!confirm('Are you sure you want to delete this product? Clients linked to it will lose their product link.')) return;
+        if (!confirm(language === 'ar' ? 'هل أنت متأكد أنك تريد حذف هذا المنتج؟ العملاء المرتبطون به سيفقدون ارتباط المنتج.' : 'Are you sure you want to delete this product? Clients linked to it will lose their product link.')) return;
         try {
             const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
-            if (!res.ok) throw new Error('Failed to delete product');
+            if (!res.ok) throw new Error(t.settings.errors.deleteFailed);
             fetchProducts();
         } catch (err) {
             alert(err.message);
@@ -82,7 +87,7 @@ export default function SettingsPage() {
     async function handleAddStatus(e) {
         e.preventDefault();
         setStatusError('');
-        if (!newStatusName.trim()) { setStatusError('Status name is required.'); return; }
+        if (!newStatusName.trim()) { setStatusError(t.settings.errors.statusNameRequired); return; }
 
         setSubmittingStatus(true);
         try {
@@ -92,22 +97,22 @@ export default function SettingsPage() {
                 body: JSON.stringify({ name: newStatusName, color: newStatusColor }),
             });
             const data = await res.json();
-            if (!res.ok) { setStatusError(data.error || 'Failed to add status.'); return; }
+            if (!res.ok) { setStatusError(data.error || t.settings.errors.creationFailed); return; }
             setNewStatusName('');
             setNewStatusColor('#6B7280');
             fetchProducts();
         } catch {
-            setStatusError('Something went wrong. Please try again.');
+            setStatusError(t.common.error + '. ' + (language === 'ar' ? 'يرجى المحاولة مجددا.' : 'Please try again.'));
         } finally {
             setSubmittingStatus(false);
         }
     }
 
     async function handleDeleteStatus(id) {
-        if (!confirm('Are you sure you want to delete this status? Clients with this status will lose their status.')) return;
+        if (!confirm(language === 'ar' ? 'هل أنت متأكد أنك تريد حذف هذه الحالة؟ العملاء بهذه الحالة سيفقدون حالتهم.' : 'Are you sure you want to delete this status? Clients with this status will lose their status.')) return;
         try {
             const res = await fetch(`/api/client-statuses/${id}`, { method: 'DELETE' });
-            if (!res.ok) throw new Error('Failed to delete status');
+            if (!res.ok) throw new Error(t.settings.errors.deleteFailed);
             fetchProducts();
         } catch (err) {
             alert(err.message);
@@ -119,9 +124,9 @@ export default function SettingsPage() {
             <header className="mv-header">
                 <div className="mv-header-inner">
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                        <Link href="/" className="mv-back">← Clients</Link>
+                        <Link href="/" className="mv-back">← {t.mainPage.title}</Link>
                         <div style={{ width: 1, height: 20, background: 'var(--color-border)' }} />
-                        <span className="mv-page-title">Settings</span>
+                        <span className="mv-page-title">{t.settings.title}</span>
                     </div>
                     <Link href="/" className="mv-logo">
                         <Image src="/mavoid-logo.png" alt="MaVoid" width={28} height={28} style={{ objectFit: 'contain' }} />
@@ -134,10 +139,10 @@ export default function SettingsPage() {
 
                 <div className="mv-card">
                     <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 14 }}>
-                        Manage Products
+                        {language === 'ar' ? 'إدارة المنتجات' : 'Manage Products'}
                     </p>
                     <p style={{ fontSize: 13, color: 'var(--color-text-subtle)', marginBottom: 20, lineHeight: 1.5 }}>
-                        These products will be available as a dropdown option when creating or editing a client.
+                        {language === 'ar' ? 'ستكون هذه المنتجات متاحة كخيار عند إنشاء أو تحرير العميل.' : 'These products will be available as a dropdown option when creating or editing a client.'}
                     </p>
 
                     {productError && <div className="mv-alert-error" style={{ marginBottom: 14 }}>{productError}</div>}
@@ -147,12 +152,12 @@ export default function SettingsPage() {
                             type="text"
                             value={newProductName}
                             onChange={(e) => setNewProductName(e.target.value)}
-                            placeholder="E.g. Website Development"
+                            placeholder={language === 'ar' ? 'مثال: تطوير موقع ويب' : 'E.g. Website Development'}
                             className="mv-input"
                             style={{ flex: 1 }}
                         />
                         <button type="submit" disabled={submitting} className="mv-btn-primary">
-                            {submitting ? 'Adding...' : 'Add Product'}
+                            {submitting ? (language === 'ar' ? 'جاري الإضافة...' : 'Adding...') : (language === 'ar' ? 'إضافة منتج' : 'Add Product')}
                         </button>
                     </form>
 
@@ -161,9 +166,9 @@ export default function SettingsPage() {
                     {error ? (
                         <div className="mv-alert-error">{error}</div>
                     ) : loading ? (
-                        <div style={{ color: 'var(--color-text-subtle)', fontSize: 13, textAlign: 'center' }}>Loading products...</div>
+                        <div style={{ color: 'var(--color-text-subtle)', fontSize: 13, textAlign: 'center' }}>{t.common.loading}</div>
                     ) : products.length === 0 ? (
-                        <div style={{ color: 'var(--color-text-subtle)', fontSize: 13, textAlign: 'center' }}>No products added yet. Add your first one above.</div>
+                        <div style={{ color: 'var(--color-text-subtle)', fontSize: 13, textAlign: 'center' }}>{language === 'ar' ? 'لم يتم إضافة منتجات بعد. أضف أول منتج أعلاه.' : 'No products added yet. Add your first one above.'}</div>
                     ) : (
                         <div style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
@@ -174,7 +179,7 @@ export default function SettingsPage() {
                                                 {product.name}
                                             </td>
                                             <td style={{ padding: '12px 16px', color: 'var(--color-text-subtle)', textAlign: 'right', fontSize: 12 }}>
-                                                {formatDate(product.createdAt)}
+                                                {formatDate(product.createdAt, locale)}
                                             </td>
                                             <td style={{ padding: '12px 16px', textAlign: 'right', width: 60 }}>
                                                 <button
@@ -183,7 +188,7 @@ export default function SettingsPage() {
                                                     onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
                                                     onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                                                 >
-                                                    Delete
+                                                    {t.settings.delete}
                                                 </button>
                                             </td>
                                         </tr>
@@ -197,10 +202,10 @@ export default function SettingsPage() {
                 {/* Client Status Management */}
                 <div className="mv-card">
                     <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 14 }}>
-                        Manage Client Statuses
+                        {t.settings.clientStatuses}
                     </p>
                     <p style={{ fontSize: 13, color: 'var(--color-text-subtle)', marginBottom: 20, lineHeight: 1.5 }}>
-                        These statuses will be available as a dropdown option when creating or editing a client. Examples: Lead, New Customer, Follow Up, Active, etc.
+                        {language === 'ar' ? 'ستكون هذه الحالات متاحة كخيار منسدل عند إنشاء أو تحرير العميل. أمثلة: عميل محتمل، عميل جديد، متابعة، نشط، إلخ.' : 'These statuses will be available as a dropdown option when creating or editing a client. Examples: Lead, New Customer, Follow Up, Active, etc.'}
                     </p>
 
                     {statusError && <div className="mv-alert-error" style={{ marginBottom: 14 }}>{statusError}</div>}
@@ -210,7 +215,7 @@ export default function SettingsPage() {
                             type="text"
                             value={newStatusName}
                             onChange={(e) => setNewStatusName(e.target.value)}
-                            placeholder="E.g. Lead, New Customer, Follow Up"
+                            placeholder={language === 'ar' ? 'مثال: عميل محتمل، عميل جديد، متابعة' : 'E.g. Lead, New Customer, Follow Up'}
                             className="mv-input"
                             style={{ flex: 1 }}
                         />
@@ -218,20 +223,20 @@ export default function SettingsPage() {
                             type="color"
                             value={newStatusColor}
                             onChange={(e) => setNewStatusColor(e.target.value)}
-                            title="Choose a color for this status"
+                            title={language === 'ar' ? 'اختر لوناً لهذه الحالة' : 'Choose a color for this status'}
                             style={{ width: 60, height: 42, border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', cursor: 'pointer' }}
                         />
                         <button type="submit" disabled={submittingStatus} className="mv-btn-primary">
-                            {submittingStatus ? 'Adding...' : 'Add Status'}
+                            {submittingStatus ? (language === 'ar' ? 'جاري الإضافة...' : 'Adding...') : t.settings.add}
                         </button>
                     </form>
 
                     <hr className="mv-divider" style={{ marginBottom: 24 }} />
 
                     {loading ? (
-                        <div style={{ color: 'var(--color-text-subtle)', fontSize: 13, textAlign: 'center' }}>Loading statuses...</div>
+                        <div style={{ color: 'var(--color-text-subtle)', fontSize: 13, textAlign: 'center' }}>{t.common.loading}</div>
                     ) : statuses.length === 0 ? (
-                        <div style={{ color: 'var(--color-text-subtle)', fontSize: 13, textAlign: 'center' }}>No statuses added yet. Add your first one above.</div>
+                        <div style={{ color: 'var(--color-text-subtle)', fontSize: 13, textAlign: 'center' }}>{t.settings.noStatuses}</div>
                     ) : (
                         <div style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
@@ -245,7 +250,7 @@ export default function SettingsPage() {
                                                 </div>
                                             </td>
                                             <td style={{ padding: '12px 16px', color: 'var(--color-text-subtle)', textAlign: 'right', fontSize: 12 }}>
-                                                {formatDate(status.createdAt)}
+                                                {formatDate(status.createdAt, locale)}
                                             </td>
                                             <td style={{ padding: '12px 16px', textAlign: 'right', width: 60 }}>
                                                 <button
@@ -254,7 +259,7 @@ export default function SettingsPage() {
                                                     onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
                                                     onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                                                 >
-                                                    Delete
+                                                    {t.settings.delete}
                                                 </button>
                                             </td>
                                         </tr>

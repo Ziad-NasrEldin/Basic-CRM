@@ -1,0 +1,133 @@
+{
+  "language": "العربية",
+  "direction": "rtl",
+  "header": {
+    "crm": "نظام إدارة العملاء",
+    "clients": "العملاء",
+    "settings": "الإعدادات"
+  },
+  "mainPage": {
+    "title": "العملاء",
+    "reminders": "التذكيرات",
+    "viewMode": "العرض",
+    "list": "قائمة",
+    "kanban": "كانبان",
+    "overdue": "متأخر",
+    "dueToday": "يستحق اليوم",
+    "noReminders": "لا توجد تذكيرات",
+    "noClients": "لم يتم إضافة عملاء بعد",
+    "addClientPrompt": "ابدأ بإضافة عميلك الأول",
+    "newClient": "عميل جديد",
+    "table": {
+      "name": "الاسم",
+      "phone": "الهاتف",
+      "status": "الحالة",
+      "tasks": "المهام",
+      "product": "المنتج",
+      "since": "منذ"
+    },
+    "task": {
+      "tasks": "مهام",
+      "nextDue": "المهمة القادمة:"
+    }
+  },
+  "clientDetail": {
+    "client": "العميل",
+    "editDetails": "تعديل بيانات العميل",
+    "save": "حفظ التغييرات",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "deleting": "جاري الحذف...",
+    "saving": "جاري الحفظ...",
+    "since": "منذ",
+    "addStatus": "+ إضافة حالة",
+    "fullName": "الاسم الكامل",
+    "phoneNumber": "رقم الهاتف",
+    "product": "المنتج",
+    "optional": "(اختياري)",
+    "noProduct": "لا يوجد منتج",
+    "fullNamePlaceholder": "مثال: أحمد حسن",
+    "phonePlaceholder": "مثال: +20 100 000 0000",
+    "noStatus": "لا توجد حالة",
+    "openTasks": "مهام معلقة",
+    "addTask": "إضافة مهمة / تذكير",
+    "taskTitle": "عنوان المهمة (مثال: اتصل بالعميل حول التسعير)",
+    "taskDescription": "تفاصيل إضافية",
+    "dueDate": "تاريخ الاستحقاق (اختياري)",
+    "remindDate": "ذكرني في (اختياري)",
+    "priority": "الأولوية",
+    "low": "منخفضة",
+    "medium": "متوسطة",
+    "high": "عالية",
+    "createTask": "إنشاء مهمة",
+    "openTask": "المهام المعلقة",
+    "completedTasks": "المهام المكتملة",
+    "markDone": "وضع علامة مكتملة",
+    "markOpen": "وضع علامة معلقة",
+    "deleteTask": "حذف",
+    "addNote": "إضافة ملاحظة",
+    "notes": "الملاحظات",
+    "noNotes": "لا توجد ملاحظات بعد",
+    "errors": {
+      "fullNameRequired": "الاسم الكامل مطلوب.",
+      "phoneRequired": "رقم الهاتف مطلوب.",
+      "updateFailed": "فشل تحديث بيانات العميل",
+      "deleteFailed": "فشل حذف العميل",
+      "taskCreationFailed": "فشل إنشاء المهمة",
+      "taskDeletionFailed": "فشل حذف المهمة",
+      "noteFailed": "فشل إضافة الملاحظة"
+    }
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "clientStatuses": "حالات العميل",
+    "statusName": "اسم الحالة",
+    "color": "اللون",
+    "add": "إضافة حالة",
+    "addNew": "إضافة حالة جديدة",
+    "delete": "حذف",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "noStatuses": "لم يتم إنشاء أي حالات بعد",
+    "createYourFirst": "إنشاء حالة العميل الأولى الخاصة بك لتنظيم عملائك",
+    "errors": {
+      "statusNameRequired": "اسم الحالة مطلوب",
+      "colorRequired": "اللون مطلوب",
+      "creationFailed": "فشل إنشاء الحالة",
+      "updateFailed": "فشل تحديث الحالة",
+      "deleteFailed": "فشل حذف الحالة"
+    }
+  },
+  "newClient": {
+    "title": "عميل جديد",
+    "form": {
+      "fullName": "الاسم الكامل",
+      "phoneNumber": "رقم الهاتف",
+      "product": "المنتج",
+      "productOptional": "(اختياري)",
+      "status": "الحالة",
+      "statusOptional": "(اختياري)",
+      "fullNamePlaceholder": "مثال: أحمد حسن",
+      "phonePlaceholder": "مثال: +20 100 000 0000"
+    },
+    "buttons": {
+      "create": "إنشاء عميل",
+      "creating": "جاري الإنشاء...",
+      "cancel": "إلغاء"
+    },
+    "errors": {
+      "fullNameRequired": "الاسم الكامل مطلوب",
+      "phoneRequired": "رقم الهاتف مطلوب",
+      "creationFailed": "فشل إنشاء العميل"
+    }
+  },
+  "common": {
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "success": "نجح",
+    "back": "إلى الخلف",
+    "search": "البحث",
+    "deleteConfirm": "هل أنت متأكد؟ لا يمكن التراجع عن ذلك."
+  }
+}

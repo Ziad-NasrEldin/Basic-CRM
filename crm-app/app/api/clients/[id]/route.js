@@ -77,3 +77,22 @@ export async function PATCH(request, { params }) {
         return Response.json({ error: 'Failed to update client' }, { status: 500 });
     }
 }
+
+export async function DELETE(request, { params }) {
+    const { id } = await params;
+    const clientId = parseInt(id);
+
+    if (isNaN(clientId)) {
+        return Response.json({ error: 'Invalid client ID' }, { status: 400 });
+    }
+
+    try {
+        await prisma.client.delete({
+            where: { id: clientId },
+        });
+        return Response.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        return Response.json({ error: 'Failed to delete client' }, { status: 500 });
+    }
+}

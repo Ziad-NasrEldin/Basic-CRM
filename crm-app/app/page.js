@@ -3,17 +3,18 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useTranslation } from '@/lib/TranslationContext';
 
-function formatDate(dateStr) {
-    return new Date(dateStr).toLocaleDateString('en-US', {
+function formatDate(dateStr, locale = 'en-US') {
+    return new Date(dateStr).toLocaleDateString(locale, {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
     });
 }
 
-function formatDateTime(dateStr) {
-    return new Date(dateStr).toLocaleString('en-US', {
+function formatDateTime(dateStr, locale = 'en-US') {
+    return new Date(dateStr).toLocaleString(locale, {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
@@ -34,6 +35,10 @@ function getPriorityColor(priority) {
 }
 
 export default function ClientsPage() {
+    const { language, toggleLanguage, translations } = useTranslation();
+    const t = translations;
+    const locale = language === 'ar' ? 'ar-SA' : 'en-US';
+    
     const [clients, setClients] = useState([]);
     const [statuses, setStatuses] = useState([]);
     const [reminders, setReminders] = useState([]);
@@ -132,9 +137,16 @@ export default function ClientsPage() {
                         </div>
                     </Link>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-                        <Link href="/settings" className="mv-back" style={{ fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Settings</Link>
+                        <button
+                            onClick={toggleLanguage}
+                            className="mv-back"
+                            style={{ fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.1em', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                        >
+                            {language === 'en' ? 'العربية' : 'English'}
+                        </button>
+                        <Link href="/settings" className="mv-back" style={{ fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.header.settings}</Link>
                         <Link href="/clients/new" id="create-client-btn" className="mv-btn-primary">
-                            + New Client
+                            + {t.mainPage.newClient}
                         </Link>
                     </div>
                 </div>
@@ -145,7 +157,7 @@ export default function ClientsPage() {
                     <input
                         id="search-input"
                         type="text"
-                        placeholder="Search by name or phone..."
+                        placeholder={language === 'ar' ? 'ابحث بالاسم أو الهاتف...' : 'Search by name or phone...'}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         className="mv-input"
@@ -159,7 +171,7 @@ export default function ClientsPage() {
                             style={{ borderRadius: 0, border: 'none' }}
                             onClick={() => setViewMode('list')}
                         >
-                            List View
+                            {t.mainPage.list}
                         </button>
                         <button
                             type="button"
@@ -167,7 +179,7 @@ export default function ClientsPage() {
                             style={{ borderRadius: 0, border: 'none' }}
                             onClick={() => setViewMode('kanban')}
                         >
-                            Kanban View
+                            {t.mainPage.kanban}
                         </button>
                     </div>
                 </div>
@@ -175,7 +187,7 @@ export default function ClientsPage() {
                 {reminders.length > 0 && (
                     <div className="mv-card" style={{ marginBottom: 20, borderLeft: '4px solid #f59e0b' }}>
                         <p style={{ marginTop: 0, marginBottom: 10, fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-                            Reminders Due Today ({reminders.length})
+                            {t.mainPage.reminders} ({reminders.length})
                         </p>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                             {reminders.slice(0, 8).map((task) => {
@@ -215,7 +227,7 @@ export default function ClientsPage() {
                                                 {task.priority}
                                             </span>
                                             <p style={{ margin: '6px 0 0 0', fontSize: 11, color: overdue ? '#b91c1c' : 'var(--color-text-subtle)' }}>
-                                                {overdue ? 'Overdue: ' : ''}{reminderTime ? formatDateTime(reminderTime) : 'No date'}
+                                                {overdue ? t.mainPage.overdue + ': ' : ''}{reminderTime ? formatDateTime(reminderTime, locale) : t.common.loading}
                                             </p>
                                         </div>
                                     </Link>
@@ -229,11 +241,11 @@ export default function ClientsPage() {
 
                 {loading ? (
                     <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--color-text-subtle)', fontSize: 13 }}>
-                        Loading...
+                        {t.common.loading}
                     </div>
                 ) : clients.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--color-text-subtle)', fontSize: 13 }}>
-                        {search ? 'No clients match your search.' : 'No clients yet. Create your first one!'}
+                        {search ? (language === 'ar' ? 'لا توجد عملاء مطابقة لبحثك.' : 'No clients match your search.') : (language === 'ar' ? 'لا يوجد عملاء بعد. أنشئ عميلك الأول!' : 'No clients yet. Create your first one!')}
                     </div>
                 ) : viewMode === 'list' ? (
                     <div className="mv-card" style={{ padding: 0, overflow: 'hidden' }}>
@@ -241,12 +253,12 @@ export default function ClientsPage() {
                             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14, minWidth: 900 }}>
                                 <thead>
                                     <tr style={{ borderBottom: '1px solid var(--color-border)', background: 'var(--color-surface)' }}>
-                                        <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>Client Name</th>
-                                        <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>Phone</th>
-                                        <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>Status</th>
-                                        <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>Tasks</th>
-                                        <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>Product</th>
-                                        <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>Since</th>
+                                        <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>{t.mainPage.table.name}</th>
+                                        <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>{t.mainPage.table.phone}</th>
+                                        <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>{t.mainPage.table.status}</th>
+                                        <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>{t.mainPage.table.tasks}</th>
+                                        <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>{t.mainPage.table.product}</th>
+                                        <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>{t.mainPage.table.since}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -276,7 +288,7 @@ export default function ClientsPage() {
                                                         disabled={updatingClientId === client.id}
                                                         style={{ fontSize: 12, padding: '6px 28px 6px 10px' }}
                                                     >
-                                                        <option value="">No Status</option>
+                                                        <option value="">{t.clientDetail.noStatus}</option>
                                                         {statuses.map((status) => (
                                                             <option key={status.id} value={status.id}>{status.name}</option>
                                                         ))}
@@ -284,11 +296,11 @@ export default function ClientsPage() {
                                                 </td>
                                                 <td style={{ padding: '14px 20px', color: 'var(--color-text-muted)' }}>
                                                     <span className="mv-badge" style={{ background: '#f3f4f6', color: 'var(--color-text-muted)' }}>
-                                                        {client.tasks?.length || 0} Open
+                                                        {client.tasks?.length || 0} {t.mainPage.task.tasks}
                                                     </span>
                                                     {nearestTask?.dueAt && (
                                                         <p style={{ margin: '6px 0 0 0', fontSize: 11, color: isOverdue(nearestTask.dueAt) ? '#b91c1c' : 'var(--color-text-subtle)' }}>
-                                                            Due {formatDate(nearestTask.dueAt)}
+                                                            {t.mainPage.table.since} {formatDate(nearestTask.dueAt, locale)}
                                                         </p>
                                                     )}
                                                 </td>
@@ -301,7 +313,7 @@ export default function ClientsPage() {
                                                         <span style={{ color: 'var(--color-text-subtle)' }}>—</span>
                                                     )}
                                                 </td>
-                                                <td style={{ padding: '14px 20px', color: 'var(--color-text-subtle)', fontSize: 13 }}>{formatDate(client.createdAt)}</td>
+                                                <td style={{ padding: '14px 20px', color: 'var(--color-text-subtle)', fontSize: 13 }}>{formatDate(client.createdAt, locale)}</td>
                                             </tr>
                                         );
                                     })}
@@ -323,7 +335,7 @@ export default function ClientsPage() {
                                 </div>
 
                                 {column.clients.length === 0 ? (
-                                    <p style={{ margin: 0, fontSize: 12, color: 'var(--color-text-subtle)' }}>No clients</p>
+                                    <p style={{ margin: 0, fontSize: 12, color: 'var(--color-text-subtle)' }}>{language === 'ar' ? 'لا توجد عملاء' : 'No clients'}</p>
                                 ) : (
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                                         {column.clients.map((client) => {
@@ -337,7 +349,7 @@ export default function ClientsPage() {
 
                                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                                                         <span className="mv-badge" style={{ background: '#f3f4f6', color: 'var(--color-text-muted)' }}>
-                                                            {client.tasks?.length || 0} Open Tasks
+                                                            {client.tasks?.length || 0} {t.clientDetail.openTasks}
                                                         </span>
                                                         <select
                                                             value={client.statusId || ''}
@@ -346,7 +358,7 @@ export default function ClientsPage() {
                                                             disabled={updatingClientId === client.id}
                                                             style={{ fontSize: 11, padding: '4px 22px 4px 8px', maxWidth: 120 }}
                                                         >
-                                                            <option value="">No Status</option>
+                                                            <option value="">{t.clientDetail.noStatus}</option>
                                                             {statuses.map((status) => (
                                                                 <option key={status.id} value={status.id}>{status.name}</option>
                                                             ))}
@@ -355,7 +367,7 @@ export default function ClientsPage() {
 
                                                     {nearestTask?.dueAt && (
                                                         <p style={{ margin: '8px 0 0 0', fontSize: 11, color: isOverdue(nearestTask.dueAt) ? '#b91c1c' : 'var(--color-text-subtle)' }}>
-                                                            Next due: {formatDate(nearestTask.dueAt)}
+                                                            {t.mainPage.task.nextDue} {formatDate(nearestTask.dueAt, locale)}
                                                         </p>
                                                     )}
                                                 </div>
@@ -369,7 +381,7 @@ export default function ClientsPage() {
                 )}
 
                 <p style={{ marginTop: 12, fontSize: 12, color: 'var(--color-text-subtle)', letterSpacing: '0.04em' }}>
-                    {clients.length} CLIENT{clients.length !== 1 ? 'S' : ''}
+                    {clients.length} {language === 'ar' ? (clients.length !== 1 ? 'عملاء' : 'عميل') : (clients.length !== 1 ? 'CLIENTS' : 'CLIENT')}
                 </p>
             </main>
         </div>

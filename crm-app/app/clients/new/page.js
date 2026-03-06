@@ -4,9 +4,13 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useTranslation } from '@/lib/TranslationContext';
 
 export default function NewClientPage() {
     const router = useRouter();
+    const { language, translations } = useTranslation();
+    const t = translations;
+    
     const [fullName, setFullName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [productId, setProductId] = useState('');
@@ -32,8 +36,8 @@ export default function NewClientPage() {
     async function handleSubmit(e) {
         e.preventDefault();
         setError('');
-        if (!fullName.trim()) { setError('Full name is required.'); return; }
-        if (!phoneNumber.trim()) { setError('Phone number is required.'); return; }
+        if (!fullName.trim()) { setError(t.newClient.errors.fullNameRequired); return; }
+        if (!phoneNumber.trim()) { setError(t.newClient.errors.phoneRequired); return; }
 
         setSubmitting(true);
         try {
@@ -43,10 +47,10 @@ export default function NewClientPage() {
                 body: JSON.stringify({ fullName, phoneNumber, productId, statusId }),
             });
             const data = await res.json();
-            if (!res.ok) { setError(data.error || 'Failed to create client.'); return; }
+            if (!res.ok) { setError(data.error || t.newClient.errors.creationFailed); return; }
             router.push(`/clients/${data.id}`);
         } catch {
-            setError('Something went wrong. Please try again.');
+            setError(t.newClient.errors.creationFailed);
         } finally {
             setSubmitting(false);
         }
@@ -58,12 +62,12 @@ export default function NewClientPage() {
             <header className="mv-header">
                 <div className="mv-header-inner">
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                        <Link href="/" className="mv-back">← Clients</Link>
+                        <Link href="/" className="mv-back">← {t.mainPage.title}</Link>
                         <div style={{ width: 1, height: 20, background: 'var(--color-border)' }} />
-                        <span className="mv-page-title">New Client</span>
+                        <span className="mv-page-title">{t.newClient.title}</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-                        <Link href="/settings" className="mv-back" style={{ fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.1em' }}>⚙️ Settings</Link>
+                        <Link href="/settings" className="mv-back" style={{ fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.1em' }}>⚙️ {t.header.settings}</Link>
                         <Link href="/" className="mv-logo">
                             <Image src="/mavoid-logo.png" alt="MaVoid" width={28} height={28} style={{ objectFit: 'contain' }} />
                             <span className="mv-logo-word" style={{ fontSize: 15 }}>MaVoid</span>
@@ -75,7 +79,7 @@ export default function NewClientPage() {
             <main style={{ maxWidth: 560, margin: '0 auto', padding: '40px 24px' }}>
                 {/* Section label */}
                 <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 16 }}>
-                    Client Information
+                    {language === 'ar' ? 'معلومات العميل' : 'Client Information'}
                 </p>
 
                 <div className="mv-card">
@@ -84,35 +88,35 @@ export default function NewClientPage() {
                     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                         <div>
                             <label htmlFor="fullName" className="mv-label">
-                                Full Name <span style={{ color: '#ef4444' }}>*</span>
+                                {t.newClient.form.fullName} <span style={{ color: '#ef4444' }}>*</span>
                             </label>
                             <input
                                 id="fullName"
                                 type="text"
                                 value={fullName}
                                 onChange={(e) => setFullName(e.target.value)}
-                                placeholder="e.g. Ahmed Hassan"
+                                placeholder={t.newClient.form.fullNamePlaceholder}
                                 className="mv-input"
                             />
                         </div>
 
                         <div>
                             <label htmlFor="phoneNumber" className="mv-label">
-                                Phone Number <span style={{ color: '#ef4444' }}>*</span>
+                                {t.newClient.form.phoneNumber} <span style={{ color: '#ef4444' }}>*</span>
                             </label>
                             <input
                                 id="phoneNumber"
                                 type="text"
                                 value={phoneNumber}
                                 onChange={(e) => setPhoneNumber(e.target.value)}
-                                placeholder="e.g. +20 100 000 0000"
+                                placeholder={t.newClient.form.phonePlaceholder}
                                 className="mv-input"
                             />
                         </div>
 
                         <div>
                             <label htmlFor="product" className="mv-label">
-                                Requested Product (Optional)
+                                {t.newClient.form.product} {t.newClient.form.productOptional}
                             </label>
                             <select
                                 id="product"
@@ -121,21 +125,21 @@ export default function NewClientPage() {
                                 className="mv-input"
                                 style={{ appearance: 'none', background: '#fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 20 20\' fill=\'%236B7280\'%3E%3Cpath fill-rule=\'evenodd\' d=\'M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z\' clip-rule=\'evenodd\'/%3E%3C/svg%3E") no-repeat right 12px center / 16px 16px', paddingRight: 40 }}
                             >
-                                <option value="">Select a product...</option>
+                                <option value="">{language === 'ar' ? 'اختر منتجاً...' : 'Select a product...'}</option>
                                 {products.map(p => (
                                     <option key={p.id} value={p.id}>{p.name}</option>
                                 ))}
                             </select>
                             {products.length === 0 && (
                                 <p style={{ margin: '6px 0 0 0', fontSize: 11, color: 'var(--color-text-subtle)' }}>
-                                    No products found. <Link href="/settings" style={{ color: 'var(--color-primary)' }}>Manage products in Settings</Link>.
+                                    {language === 'ar' ? 'لم يتم العثور على منتجات. ' : 'No products found. '} <Link href="/settings" style={{ color: 'var(--color-primary)' }}>{language === 'ar' ? 'إدارة المنتجات في الإعدادات' : 'Manage products in Settings'}</Link>.
                                 </p>
                             )}
                         </div>
 
                         <div>
                             <label htmlFor="status" className="mv-label">
-                                Client Status (Optional)
+                                {t.newClient.form.status} {t.newClient.form.statusOptional}
                             </label>
                             <select
                                 id="status"
@@ -144,14 +148,14 @@ export default function NewClientPage() {
                                 className="mv-input"
                                 style={{ appearance: 'none', background: '#fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 20 20\' fill=\'%236B7280\'%3E%3Cpath fill-rule=\'evenodd\' d=\'M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z\' clip-rule=\'evenodd\'/%3E%3C/svg%3E") no-repeat right 12px center / 16px 16px', paddingRight: 40 }}
                             >
-                                <option value="">Select a status...</option>
+                                <option value="">{language === 'ar' ? 'اختر حالة...' : 'Select a status...'}</option>
                                 {statuses.map(s => (
                                     <option key={s.id} value={s.id}>{s.name}</option>
                                 ))}
                             </select>
                             {statuses.length === 0 && (
                                 <p style={{ margin: '6px 0 0 0', fontSize: 11, color: 'var(--color-text-subtle)' }}>
-                                    No statuses found. <Link href="/settings" style={{ color: 'var(--color-primary)' }}>Manage statuses in Settings</Link>.
+                                    {language === 'ar' ? 'لم يتم العثور على حالات. ' : 'No statuses found. '} <Link href="/settings" style={{ color: 'var(--color-primary)' }}>{language === 'ar' ? 'إدارة الحالات في الإعدادات' : 'Manage statuses in Settings'}</Link>.
                                 </p>
                             )}
                         </div>
@@ -165,9 +169,9 @@ export default function NewClientPage() {
                                 disabled={submitting}
                                 className="mv-btn-primary"
                             >
-                                {submitting ? 'Saving...' : 'Create Client'}
+                                {submitting ? t.newClient.buttons.creating : t.newClient.buttons.create}
                             </button>
-                            <Link href="/" className="mv-btn-secondary">Cancel</Link>
+                            <Link href="/" className="mv-btn-secondary">{t.newClient.buttons.cancel}</Link>
                         </div>
                     </form>
                 </div>

@@ -1,0 +1,133 @@
+{
+  "language": "English",
+  "direction": "ltr",
+  "header": {
+    "crm": "Basic CRM",
+    "clients": "Clients",
+    "settings": "Settings"
+  },
+  "mainPage": {
+    "title": "Clients",
+    "reminders": "Reminders",
+    "viewMode": "View",
+    "list": "List",
+    "kanban": "Kanban",
+    "overdue": "Overdue",
+    "dueToday": "Due Today",
+    "noReminders": "No reminders",
+    "noClients": "No clients yet",
+    "addClientPrompt": "Get started by adding your first client",
+    "newClient": "New Client",
+    "table": {
+      "name": "Name",
+      "phone": "Phone",
+      "status": "Status",
+      "tasks": "Tasks",
+      "product": "Product",
+      "since": "Since"
+    },
+    "task": {
+      "tasks": "tasks",
+      "nextDue": "Next due:"
+    }
+  },
+  "clientDetail": {
+    "client": "Client",
+    "editDetails": "Edit Client Details",
+    "save": "Save Changes",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "deleting": "Deleting...",
+    "saving": "Saving...",
+    "since": "Since",
+    "addStatus": "+ Add Status",
+    "fullName": "Full Name",
+    "phoneNumber": "Phone Number",
+    "product": "Product",
+    "optional": "(Optional)",
+    "noProduct": "No Product",
+    "fullNamePlaceholder": "e.g. Ahmed Hassan",
+    "phonePlaceholder": "e.g. +20 100 000 0000",
+    "noStatus": "No Status",
+    "openTasks": "Open Tasks",
+    "addTask": "Add Task / Reminder",
+    "taskTitle": "Task title (e.g. Call client about pricing)",
+    "taskDescription": "Optional details",
+    "dueDate": "Due date (optional)",
+    "remindDate": "Remind me on (optional)",
+    "priority": "Priority",
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "createTask": "Create Task",
+    "openTask": "Open Tasks",
+    "completedTasks": "Completed Tasks",
+    "markDone": "Mark Done",
+    "markOpen": "Mark Open",
+    "deleteTask": "Delete",
+    "addNote": "Add Note",
+    "notes": "Notes",
+    "noNotes": "No notes yet",
+    "errors": {
+      "fullNameRequired": "Full name required.",
+      "phoneRequired": "Phone number required.",
+      "updateFailed": "Failed to update client",
+      "deleteFailed": "Failed to delete client",
+      "taskCreationFailed": "Failed to create task",
+      "taskDeletionFailed": "Failed to delete task",
+      "noteFailed": "Failed to add note"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "clientStatuses": "Client Statuses",
+    "statusName": "Status name",
+    "color": "Color",
+    "add": "Add Status",
+    "addNew": "Add New Status",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "noStatuses": "No statuses created yet",
+    "createYourFirst": "Create your first client status to organize your clients",
+    "errors": {
+      "statusNameRequired": "Status name is required",
+      "colorRequired": "Color is required",
+      "creationFailed": "Failed to create status",
+      "updateFailed": "Failed to update status",
+      "deleteFailed": "Failed to delete status"
+    }
+  },
+  "newClient": {
+    "title": "New Client",
+    "form": {
+      "fullName": "Full Name",
+      "phoneNumber": "Phone Number",
+      "product": "Product",
+      "productOptional": "(Optional)",
+      "status": "Status",
+      "statusOptional": "(Optional)",
+      "fullNamePlaceholder": "e.g. Ahmed Hassan",
+      "phonePlaceholder": "e.g. +20 100 000 0000"
+    },
+    "buttons": {
+      "create": "Create Client",
+      "creating": "Creating...",
+      "cancel": "Cancel"
+    },
+    "errors": {
+      "fullNameRequired": "Full name is required",
+      "phoneRequired": "Phone number is required",
+      "creationFailed": "Failed to create client"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "back": "Back",
+    "search": "Search",
+    "deleteConfirm": "Are you sure? This cannot be undone."
+  }
+}

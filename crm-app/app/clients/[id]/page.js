@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -8,66 +8,19 @@ import { useTranslation } from '@/lib/TranslationContext';
 
 function formatDateTime(dateStr, locale = 'en-US') {
     return new Date(dateStr).toLocaleString(locale, {
-        year: 'numeric', month: 'short', day: 'numeric',
-        hour: '2-digit', minute: '2-digit',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
     });
 }
 
-    async function handleAddPayment(e) {
-        e.preventDefault();
-        setPaymentError('');
-
-        if (!paymentAmount || parseFloat(paymentAmount) <= 0) {
-            setPaymentError(t.clientDetail.errors.paymentAmountRequired);
-            return;
-        }
-        if (!paymentDate) {
-            setPaymentError(t.clientDetail.errors.paymentDateRequired);
-            return;
-        }
-
-        setSubmittingPayment(true);
-        try {
-            const res = await fetch('/api/payments', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    clientId: id,
-                    amount: parseFloat(paymentAmount),
-                    paidAt: paymentDate,
-                    note: paymentNote.trim() || null,
-                }),
-            });
-            if (!res.ok) throw new Error(t.clientDetail.errors.paymentCreationFailed);
-            await fetchClient();
-            setPaymentAmount('');
-            setPaymentDate('');
-            setPaymentNote('');
-        } catch (err) {
-            setPaymentError(err.message);
-        } finally {
-            setSubmittingPayment(false);
-        }
-    }
-
-    async function handleDeletePayment(paymentId) {
-        if (!confirm(t.common.deleteConfirm)) return;
-
-        setDeletingPaymentId(paymentId);
-        try {
-            const res = await fetch(`/api/payments/${paymentId}`, { method: 'DELETE' });
-            if (!res.ok) throw new Error(t.clientDetail.errors.paymentDeletionFailed);
-            await fetchClient();
-        } catch (err) {
-            alert(err.message);
-        } finally {
-            setDeletingPaymentId(null);
-        }
-    }
-
 function formatDate(dateStr, locale = 'en-US') {
     return new Date(dateStr).toLocaleDateString(locale, {
-        year: 'numeric', month: 'short', day: 'numeric',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
     });
 }
 
@@ -92,7 +45,7 @@ export default function ClientDetailPage() {
     const { language, translations } = useTranslation();
     const t = translations;
     const locale = language === 'ar' ? 'ar-SA' : 'en-US';
-    
+
     const [client, setClient] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -101,7 +54,7 @@ export default function ClientDetailPage() {
     const [editFullName, setEditFullName] = useState('');
     const [editPhoneNumber, setEditPhoneNumber] = useState('');
     const [editProductId, setEditProductId] = useState('');
-        const [editSaleValue, setEditSaleValue] = useState('');
+    const [editSaleValue, setEditSaleValue] = useState('');
     const [products, setProducts] = useState([]);
     const [submittingEdit, setSubmittingEdit] = useState(false);
     const [editError, setEditError] = useState('');
@@ -136,7 +89,10 @@ export default function ClientDetailPage() {
         setError('');
         try {
             const res = await fetch(`/api/clients/${id}`);
-            if (res.status === 404) { setError('Client not found.'); return; }
+            if (res.status === 404) {
+                setError('Client not found.');
+                return;
+            }
             if (!res.ok) throw new Error('Failed to load client');
             setClient(await res.json());
         } catch (err) {
@@ -162,10 +118,65 @@ export default function ClientDetailPage() {
             .catch(console.error);
     }, []);
 
+    async function handleAddPayment(e) {
+        e.preventDefault();
+        setPaymentError('');
+
+        if (!paymentAmount || parseFloat(paymentAmount) <= 0) {
+            setPaymentError(t.clientDetail.errors.paymentAmountRequired);
+            return;
+        }
+        if (!paymentDate) {
+            setPaymentError(t.clientDetail.errors.paymentDateRequired);
+            return;
+        }
+
+        setSubmittingPayment(true);
+        try {
+            const res = await fetch('/api/payments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    clientId: parseInt(id, 10),
+                    amount: parseFloat(paymentAmount),
+                    paidAt: paymentDate,
+                    note: paymentNote.trim() || null,
+                }),
+            });
+            if (!res.ok) throw new Error(t.clientDetail.errors.paymentCreationFailed);
+            setPaymentAmount('');
+            setPaymentDate('');
+            setPaymentNote('');
+            await fetchClient();
+        } catch (err) {
+            setPaymentError(err.message);
+        } finally {
+            setSubmittingPayment(false);
+        }
+    }
+
+    async function handleDeletePayment(paymentId) {
+        if (!confirm(t.common.deleteConfirm)) return;
+
+        setDeletingPaymentId(paymentId);
+        try {
+            const res = await fetch(`/api/payments/${paymentId}`, { method: 'DELETE' });
+            if (!res.ok) throw new Error(t.clientDetail.errors.paymentDeletionFailed);
+            await fetchClient();
+        } catch (err) {
+            alert(err.message);
+        } finally {
+            setDeletingPaymentId(null);
+        }
+    }
+
     async function handleAddNote(e) {
         e.preventDefault();
         setNoteError('');
-        if (!noteContent.trim()) { setNoteError('Note content cannot be empty.'); return; }
+        if (!noteContent.trim()) {
+            setNoteError('Note content cannot be empty.');
+            return;
+        }
 
         setSubmittingNote(true);
         try {
@@ -175,7 +186,10 @@ export default function ClientDetailPage() {
                 body: JSON.stringify({ clientId: parseInt(id, 10), content: noteContent }),
             });
             const data = await res.json();
-            if (!res.ok) { setNoteError(data.error || 'Failed to add note.'); return; }
+            if (!res.ok) {
+                setNoteError(data.error || 'Failed to add note.');
+                return;
+            }
             setNoteContent('');
             await fetchClient();
         } catch {
@@ -278,7 +292,7 @@ export default function ClientDetailPage() {
         setEditFullName(client.fullName);
         setEditPhoneNumber(client.phoneNumber);
         setEditProductId(client.productId || '');
-            setEditSaleValue(client.saleValue ? parseFloat(client.saleValue).toString() : '');
+        setEditSaleValue(client.saleValue ? parseFloat(client.saleValue).toString() : '');
         setEditError('');
         setEditingDetails(true);
     }
@@ -305,7 +319,7 @@ export default function ClientDetailPage() {
                     fullName: editFullName.trim(),
                     phoneNumber: editPhoneNumber.trim(),
                     productId: editProductId || null,
-                                    saleValue: editSaleValue || null,
+                    saleValue: editSaleValue || null,
                 }),
             });
             if (!res.ok) throw new Error('Failed to update client');
@@ -338,6 +352,25 @@ export default function ClientDetailPage() {
         }
     }
 
+    const openTasks = client?.tasks?.filter((task) => !task.completed) || [];
+    const doneTasks = client?.tasks?.filter((task) => task.completed) || [];
+
+    const paymentTotals = useMemo(() => {
+        if (!client?.saleValue) {
+            return {
+                sale: 0,
+                paid: 0,
+                remaining: 0,
+            };
+        }
+
+        const sale = parseFloat(client.saleValue) || 0;
+        const paid = (client.payments || []).reduce((sum, p) => sum + parseFloat(p.amount), 0);
+        const remaining = sale - paid;
+
+        return { sale, paid, remaining };
+    }, [client]);
+
     if (loading) {
         return (
             <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-subtle)', fontSize: 13 }}>
@@ -355,11 +388,8 @@ export default function ClientDetailPage() {
         );
     }
 
-    const openTasks = client.tasks.filter((task) => !task.completed);
-    const doneTasks = client.tasks.filter((task) => task.completed);
-
     return (
-        <div style={{ minHeight: '100vh', background: '#F9FAFB' }}>
+        <div className="cd-page-wrap">
             <header className="mv-header">
                 <div className="mv-header-inner">
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -377,16 +407,13 @@ export default function ClientDetailPage() {
                 </div>
             </header>
 
-            <main style={{ maxWidth: 880, margin: '0 auto', padding: '40px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <main className="cd-main">
                 {editingDetails ? (
-                    <div className="mv-card">
-                        <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 14 }}>
-                            {t.clientDetail.editDetails}
-                        </p>
-
+                    <section className="mv-card">
+                        <p className="cd-kicker">{t.clientDetail.editDetails}</p>
                         {editError && <div className="mv-alert-error" style={{ marginBottom: 14 }}>{editError}</div>}
 
-                        <form onSubmit={handleEditDetailsSave} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        <form onSubmit={handleEditDetailsSave} className="cd-stack-12">
                             <div>
                                 <label className="mv-label">{t.clientDetail.fullName}</label>
                                 <input
@@ -411,225 +438,77 @@ export default function ClientDetailPage() {
 
                             <div>
                                 <label className="mv-label">{t.clientDetail.product} {t.clientDetail.optional}</label>
-                                <select
-                                    value={editProductId}
-                                    onChange={(e) => setEditProductId(e.target.value)}
-                                    className="mv-input"
-                                >
+                                <select value={editProductId} onChange={(e) => setEditProductId(e.target.value)} className="mv-input">
                                     <option value="">{t.clientDetail.noProduct}</option>
                                     {products.map((p) => (
                                         <option key={p.id} value={p.id}>{p.name}</option>
                                     ))}
                                 </select>
-
-                                                        <div>
-                                                            <label className="mv-label">{t.clientDetail.saleValue} {t.clientDetail.optional}</label>
-                                                            <input
-                                                                type="number"
-                                                                step="0.01"
-                                                                min="0"
-                                                                value={editSaleValue}
-                                                                onChange={(e) => setEditSaleValue(e.target.value)}
-                                                                className="mv-input"
-                                                                placeholder="0.00"
-                                                            />
-                                                        </div>
                             </div>
 
-                            <div style={{ display: 'flex', gap: 8 }}>
+                            <div>
+                                <label className="mv-label">{t.clientDetail.saleValue} {t.clientDetail.optional}</label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={editSaleValue}
+                                    onChange={(e) => setEditSaleValue(e.target.value)}
+                                    className="mv-input"
+                                    placeholder="0.00"
+                                />
+                            </div>
+
+                            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                                 <button type="submit" disabled={submittingEdit} className="mv-btn-primary">
                                     {submittingEdit ? t.clientDetail.saving : t.clientDetail.save}
                                 </button>
-                                <button
-                                    type="button"
-                                    disabled={submittingEdit}
-                                    className="mv-btn-secondary"
-                                    onClick={handleEditDetailsCancel}
-                                >
+                                <button type="button" disabled={submittingEdit} className="mv-btn-secondary" onClick={handleEditDetailsCancel}>
                                     {t.clientDetail.cancel}
                                 </button>
                             </div>
                         </form>
-                    </div>
+                    </section>
                 ) : (
-                    <div className="mv-card" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
-                        <div>
-                            <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 6 }}>
-                                {t.clientDetail.client}
-                            </p>
-                            <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-text)', margin: 0, marginBottom: 4 }}>
-                                {client.fullName}
-                            </h2>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4, flexWrap: 'wrap' }}>
-                                <p style={{ fontSize: 14, color: 'var(--color-text-muted)', margin: 0 }}>{client.phoneNumber}</p>
-                                {client.product && (
-                                    <span className="mv-badge" style={{ background: '#f3f4f6', color: 'var(--color-text-muted)' }}>
-                                        {client.product.name}
-                                    </span>
-                                )}
-
-                                                {/* Payments Section */}
-                                                {client.saleValue && (
-                                                    <>
-                                                        <div className="mv-card" style={{ background: '#f0f9ff', borderColor: '#bae6fd' }}>
-                                                            <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 14 }}>
-                                                                {t.clientDetail.saleValue}
-                                                            </p>
-                                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 16 }}>
-                                                                <div>
-                                                                    <p style={{ fontSize: 11, color: 'var(--color-text-subtle)', margin: '0 0 4px 0' }}>{t.clientDetail.saleValue}</p>
-                                                                    <p style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text)', margin: 0 }}>
-                                                                        {parseFloat(client.saleValue).toLocaleString(locale, { minimumFractionDigits: 2 })}
-                                                                    </p>
-                                                                </div>
-                                                                <div>
-                                                                    <p style={{ fontSize: 11, color: 'var(--color-text-subtle)', margin: '0 0 4px 0' }}>{t.clientDetail.totalPaid}</p>
-                                                                    <p style={{ fontSize: 20, fontWeight: 700, color: '#059669', margin: 0 }}>
-                                                                        {(client.payments?.reduce((sum, p) => sum + parseFloat(p.amount), 0) || 0).toLocaleString(locale, { minimumFractionDigits: 2 })}
-                                                                    </p>
-                                                                </div>
-                                                                <div>
-                                                                    <p style={{ fontSize: 11, color: 'var(--color-text-subtle)', margin: '0 0 4px 0' }}>{t.clientDetail.remaining}</p>
-                                                                    <p style={{ fontSize: 20, fontWeight: 700, color: '#dc2626', margin: 0 }}>
-                                                                        {(parseFloat(client.saleValue) - (client.payments?.reduce((sum, p) => sum + parseFloat(p.amount), 0) || 0)).toLocaleString(locale, { minimumFractionDigits: 2 })}
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="mv-card">
-                                                            <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 14 }}>
-                                                                {t.clientDetail.addPayment}
-                                                            </p>
-
-                                                            {paymentError && <div className="mv-alert-error" style={{ marginBottom: 14 }}>{paymentError}</div>}
-
-                                                            <form onSubmit={handleAddPayment} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                                                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
-                                                                    <div>
-                                                                        <label className="mv-label">{t.clientDetail.paymentAmount}</label>
-                                                                        <input
-                                                                            type="number"
-                                                                            step="0.01"
-                                                                            min="0"
-                                                                            value={paymentAmount}
-                                                                            onChange={(e) => setPaymentAmount(e.target.value)}
-                                                                            placeholder="0.00"
-                                                                            className="mv-input"
-                                                                        />
-                                                                    </div>
-                                                                    <div>
-                                                                        <label className="mv-label">{t.clientDetail.paymentDate}</label>
-                                                                        <input
-                                                                            type="datetime-local"
-                                                                            value={paymentDate}
-                                                                            onChange={(e) => setPaymentDate(e.target.value)}
-                                                                            className="mv-input"
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                                <div>
-                                                                    <label className="mv-label">{t.clientDetail.paymentNote}</label>
-                                                                    <input
-                                                                        type="text"
-                                                                        value={paymentNote}
-                                                                        onChange={(e) => setPaymentNote(e.target.value)}
-                                                                        placeholder={language === 'ar' ? 'ملاحظة عن الدفعة...' : 'Note about this payment...'}
-                                                                        className="mv-input"
-                                                                    />
-                                                                </div>
-                                                                <div>
-                                                                    <button type="submit" disabled={submittingPayment} className="mv-btn-primary">
-                                                                        {submittingPayment ? t.clientDetail.saving : t.clientDetail.recordPayment}
-                                                                    </button>
-                                                                </div>
-                                                            </form>
-                                                        </div>
-
-                                                        <div>
-                                                            <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 14 }}>
-                                                                {t.clientDetail.payments} ({client.payments?.length || 0})
-                                                            </p>
-
-                                                            {(!client.payments || client.payments.length === 0) ? (
-                                                                <div className="mv-card" style={{ textAlign: 'center', color: 'var(--color-text-subtle)', fontSize: 13 }}>
-                                                                    {t.clientDetail.noPayments}
-                                                                </div>
-                                                            ) : (
-                                                                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                                                                    {client.payments.map((payment) => (
-                                                                        <div key={payment.id} className="mv-card" style={{ padding: '16px 20px' }}>
-                                                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: 12 }}>
-                                                                                <div style={{ flex: 1 }}>
-                                                                                    <p style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#059669' }}>
-                                                                                        {parseFloat(payment.amount).toLocaleString(locale, { minimumFractionDigits: 2 })}
-                                                                                    </p>
-                                                                                    <p style={{ margin: '6px 0 0 0', fontSize: 13, color: 'var(--color-text-muted)' }}>
-                                                                                        {t.clientDetail.paid} {t.clientDetail.on} {formatDateTime(payment.paidAt, locale)}
-                                                                                    </p>
-                                                                                    {payment.note && (
-                                                                                        <p style={{ margin: '8px 0 0 0', fontSize: 13, color: 'var(--color-text)', fontStyle: 'italic' }}>
-                                                                                            {payment.note}
-                                                                                        </p>
-                                                                                    )}
-                                                                                </div>
-                                                                                <button
-                                                                                    type="button"
-                                                                                    className="mv-btn-secondary"
-                                                                                    style={{ fontSize: 12, padding: '6px 12px' }}
-                                                                                    disabled={deletingPaymentId === payment.id}
-                                                                                    onClick={() => handleDeletePayment(payment.id)}
-                                                                                >
-                                                                                    {t.clientDetail.deletePayment}
-                                                                                </button>
-                                                                            </div>
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </>
-                                                )}
-                                <span className="mv-badge" style={{ background: '#f3f4f6', color: 'var(--color-text-muted)' }}>
-                                    {openTasks.length} {t.clientDetail.openTasks}
-                                </span>
-                            </div>
-                        </div>
-                        <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'flex-end' }}>
+                    <section className="mv-card cd-hero-card">
+                        <div className="cd-hero-top">
                             <div>
+                                <p className="cd-kicker">{t.clientDetail.client}</p>
+                                <h1 className="cd-client-name">{client.fullName}</h1>
+                                <p className="cd-client-phone">{client.phoneNumber}</p>
+                            </div>
+
+                            <div className="cd-hero-actions">
                                 {editingStatus ? (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
-                                        <select
-                                            value={selectedStatusId}
-                                            onChange={(e) => setSelectedStatusId(e.target.value)}
-                                            className="mv-input"
-                                            style={{ fontSize: 13, padding: '6px 32px 6px 10px', minWidth: 150 }}
-                                        >
+                                    <div className="cd-status-editor">
+                                        <select value={selectedStatusId} onChange={(e) => setSelectedStatusId(e.target.value)} className="mv-input" style={{ minWidth: 180 }}>
                                             <option value="">{t.clientDetail.noStatus}</option>
                                             {statuses.map((s) => (
                                                 <option key={s.id} value={s.id}>{s.name}</option>
                                             ))}
                                         </select>
-                                        <div style={{ display: 'flex', gap: 6 }}>
-                                            <button onClick={() => handleUpdateStatus(selectedStatusId)} className="mv-btn-primary" style={{ fontSize: 12, padding: '5px 12px' }}>
+                                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                                            <button type="button" onClick={() => handleUpdateStatus(selectedStatusId)} className="mv-btn-primary" style={{ fontSize: 12, padding: '7px 12px' }}>
                                                 {t.clientDetail.save}
                                             </button>
                                             <button
+                                                type="button"
                                                 onClick={() => {
                                                     setEditingStatus(false);
                                                     setSelectedStatusId(client.statusId || '');
                                                 }}
                                                 className="mv-btn-secondary"
-                                                style={{ fontSize: 12, padding: '5px 12px' }}
+                                                style={{ fontSize: 12, padding: '7px 12px' }}
                                             >
                                                 {t.clientDetail.cancel}
                                             </button>
                                         </div>
                                     </div>
                                 ) : (
-                                    <div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                                         {client.status ? (
-                                            <span
+                                            <button
+                                                type="button"
                                                 className="mv-badge"
                                                 style={{
                                                     background: `${client.status.color}20`,
@@ -644,58 +523,161 @@ export default function ClientDetailPage() {
                                                 title={language === 'ar' ? 'انقر لتغيير الحالة' : 'Click to change status'}
                                             >
                                                 {client.status.name}
-                                            </span>
+                                            </button>
                                         ) : (
                                             <button
+                                                type="button"
                                                 onClick={() => {
                                                     setEditingStatus(true);
                                                     setSelectedStatusId('');
                                                 }}
                                                 className="mv-badge"
-                                                style={{ background: '#f3f4f6', color: 'var(--color-text-muted)', cursor: 'pointer', border: 'none' }}
+                                                style={{ background: '#f3f4f6', color: 'var(--color-text-muted)', border: 'none', cursor: 'pointer' }}
                                             >
                                                 {t.clientDetail.addStatus}
                                             </button>
                                         )}
                                     </div>
                                 )}
-                            </div>
 
-                            <div style={{ display: 'flex', gap: 6 }}>
-                                <button
-                                    type="button"
-                                    className="mv-btn-secondary"
-                                    onClick={handleEditDetailsOpen}
-                                    style={{ fontSize: 12, padding: '5px 12px' }}
-                                >
-                                    {t.clientDetail.edit}
-                                </button>
-                                <button
-                                    type="button"
-                                    className="mv-btn-secondary"
-                                    onClick={handleDeleteClient}
-                                    disabled={deletingClient}
-                                    style={{ fontSize: 12, padding: '5px 12px', color: '#b91c1c', borderColor: '#fecaca' }}
-                                >
-                                    {deletingClient ? t.clientDetail.deleting : t.clientDetail.delete}
-                                </button>
+                                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                                    <button type="button" className="mv-btn-secondary" onClick={handleEditDetailsOpen} style={{ fontSize: 12, padding: '7px 12px' }}>
+                                        {t.clientDetail.edit}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="mv-btn-secondary"
+                                        onClick={handleDeleteClient}
+                                        disabled={deletingClient}
+                                        style={{ fontSize: 12, padding: '7px 12px', color: '#b91c1c', borderColor: '#fecaca' }}
+                                    >
+                                        {deletingClient ? t.clientDetail.deleting : t.clientDetail.delete}
+                                    </button>
+                                </div>
                             </div>
-
-                            <p style={{ fontSize: 12, color: 'var(--color-text-subtle)', margin: 0 }}>
-                                {t.clientDetail.since} {formatDate(client.createdAt, locale)}
-                            </p>
                         </div>
-                    </div>
+
+                        <div className="cd-meta-row">
+                            {client.product && <span className="mv-badge cd-neutral-badge">{client.product.name}</span>}
+                            <span className="mv-badge cd-neutral-badge">{openTasks.length} {t.clientDetail.openTasks}</span>
+                            <span className="cd-since">{t.clientDetail.since} {formatDate(client.createdAt, locale)}</span>
+                        </div>
+                    </section>
                 )}
 
-                <div className="mv-card">
-                    <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 14 }}>
-                        {t.clientDetail.addTask}
-                    </p>
+                {client.saleValue && (
+                    <section className="cd-payment-zone">
+                        <div className="mv-card cd-sale-summary">
+                            <p className="cd-kicker">{t.clientDetail.saleValue}</p>
+                            <div className="cd-metric-grid">
+                                <div className="cd-metric">
+                                    <p>{t.clientDetail.saleValue}</p>
+                                    <h3>{paymentTotals.sale.toLocaleString(locale, { minimumFractionDigits: 2 })}</h3>
+                                </div>
+                                <div className="cd-metric">
+                                    <p>{t.clientDetail.totalPaid}</p>
+                                    <h3 className="cd-positive">{paymentTotals.paid.toLocaleString(locale, { minimumFractionDigits: 2 })}</h3>
+                                </div>
+                                <div className="cd-metric">
+                                    <p>{t.clientDetail.remaining}</p>
+                                    <h3 className={paymentTotals.remaining > 0 ? 'cd-negative' : 'cd-positive'}>
+                                        {paymentTotals.remaining.toLocaleString(locale, { minimumFractionDigits: 2 })}
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
 
+                        <div className="mv-card cd-payment-form-card">
+                            <p className="cd-kicker">{t.clientDetail.addPayment}</p>
+                            {paymentError && <div className="mv-alert-error" style={{ marginBottom: 14 }}>{paymentError}</div>}
+
+                            <form onSubmit={handleAddPayment} className="cd-stack-12">
+                                <div className="cd-two-col-grid">
+                                    <div>
+                                        <label className="mv-label">{t.clientDetail.paymentAmount}</label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                            value={paymentAmount}
+                                            onChange={(e) => setPaymentAmount(e.target.value)}
+                                            placeholder="0.00"
+                                            className="mv-input"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="mv-label">{t.clientDetail.paymentDate}</label>
+                                        <input
+                                            type="datetime-local"
+                                            value={paymentDate}
+                                            onChange={(e) => setPaymentDate(e.target.value)}
+                                            className="mv-input"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="mv-label">{t.clientDetail.paymentNote}</label>
+                                    <input
+                                        type="text"
+                                        value={paymentNote}
+                                        onChange={(e) => setPaymentNote(e.target.value)}
+                                        placeholder={language === 'ar' ? 'ملاحظة عن الدفعة...' : 'Note about this payment...'}
+                                        className="mv-input"
+                                    />
+                                </div>
+
+                                <div>
+                                    <button type="submit" disabled={submittingPayment} className="mv-btn-primary">
+                                        {submittingPayment ? t.clientDetail.saving : t.clientDetail.recordPayment}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+                )}
+
+                {client.saleValue && (
+                    <section className="mv-card">
+                        <p className="cd-kicker">{t.clientDetail.payments} ({client.payments?.length || 0})</p>
+
+                        {(!client.payments || client.payments.length === 0) ? (
+                            <div className="cd-empty-block">{t.clientDetail.noPayments}</div>
+                        ) : (
+                            <div className="cd-stack-10">
+                                {client.payments.map((payment) => (
+                                    <article key={payment.id} className="cd-item-card">
+                                        <div style={{ flex: 1 }}>
+                                            <p className="cd-payment-amount">
+                                                {parseFloat(payment.amount).toLocaleString(locale, { minimumFractionDigits: 2 })}
+                                            </p>
+                                            <p className="cd-muted-line">
+                                                {t.clientDetail.paid} {t.clientDetail.on} {formatDateTime(payment.paidAt, locale)}
+                                            </p>
+                                            {payment.note && <p className="cd-note-preview">{payment.note}</p>}
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            className="mv-btn-secondary"
+                                            style={{ fontSize: 12, padding: '6px 12px', color: '#b91c1c', borderColor: '#fecaca' }}
+                                            disabled={deletingPaymentId === payment.id}
+                                            onClick={() => handleDeletePayment(payment.id)}
+                                        >
+                                            {t.clientDetail.deletePayment}
+                                        </button>
+                                    </article>
+                                ))}
+                            </div>
+                        )}
+                    </section>
+                )}
+
+                <section className="mv-card">
+                    <p className="cd-kicker">{t.clientDetail.addTask}</p>
                     {taskError && <div className="mv-alert-error" style={{ marginBottom: 14 }}>{taskError}</div>}
 
-                    <form onSubmit={handleAddTask} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <form onSubmit={handleAddTask} className="cd-stack-12">
                         <input
                             type="text"
                             value={taskTitle}
@@ -712,24 +694,14 @@ export default function ClientDetailPage() {
                             className="mv-textarea"
                         />
 
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10 }}>
+                        <div className="cd-three-col-grid">
                             <div>
                                 <label className="mv-label">{t.clientDetail.dueDate}</label>
-                                <input
-                                    type="datetime-local"
-                                    value={taskDueAt}
-                                    onChange={(e) => setTaskDueAt(e.target.value)}
-                                    className="mv-input"
-                                />
+                                <input type="datetime-local" value={taskDueAt} onChange={(e) => setTaskDueAt(e.target.value)} className="mv-input" />
                             </div>
                             <div>
                                 <label className="mv-label">{t.clientDetail.remindDate}</label>
-                                <input
-                                    type="datetime-local"
-                                    value={taskRemindAt}
-                                    onChange={(e) => setTaskRemindAt(e.target.value)}
-                                    className="mv-input"
-                                />
+                                <input type="datetime-local" value={taskRemindAt} onChange={(e) => setTaskRemindAt(e.target.value)} className="mv-input" />
                             </div>
                             <div>
                                 <label className="mv-label">{t.clientDetail.priority}</label>
@@ -747,30 +719,23 @@ export default function ClientDetailPage() {
                             </button>
                         </div>
                     </form>
-                </div>
+                </section>
 
-                <div>
-                    <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 14 }}>
-                        {t.clientDetail.openTask} ({openTasks.length})
-                    </p>
-
-                    {openTasks.length === 0 ? (
-                        <div className="mv-card" style={{ textAlign: 'center', color: 'var(--color-text-subtle)', fontSize: 13 }}>
-                            {language === 'ar' ? 'لا توجد مهام معلقة.' : 'No open tasks.'}
-                        </div>
-                    ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                            {openTasks.map((task) => {
-                                const overdue = isOverdue(task.remindAt || task.dueAt);
-                                return (
-                                    <div key={task.id} className="mv-card" style={{ padding: '16px 20px' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-                                            <div style={{ flex: '1 1 280px' }}>
-                                                <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'var(--color-text)' }}>{task.title}</p>
-                                                {task.description && (
-                                                    <p style={{ margin: '6px 0 0 0', fontSize: 13, color: 'var(--color-text-muted)' }}>{task.description}</p>
-                                                )}
-                                                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
+                <section className="cd-task-columns">
+                    <div>
+                        <p className="cd-kicker">{t.clientDetail.openTask} ({openTasks.length})</p>
+                        {openTasks.length === 0 ? (
+                            <div className="mv-card cd-empty-block">{language === 'ar' ? 'لا توجد مهام معلقة.' : 'No open tasks.'}</div>
+                        ) : (
+                            <div className="cd-stack-10">
+                                {openTasks.map((task) => {
+                                    const overdue = isOverdue(task.remindAt || task.dueAt);
+                                    return (
+                                        <article key={task.id} className="mv-card cd-task-item">
+                                            <div style={{ flex: 1 }}>
+                                                <p className="cd-task-title">{task.title}</p>
+                                                {task.description && <p className="cd-muted-line">{task.description}</p>}
+                                                <div className="cd-task-badges">
                                                     <span className="mv-badge" style={priorityStyle(task.priority)}>{task.priority}</span>
                                                     {task.dueAt && (
                                                         <span className="mv-badge" style={{ background: overdue ? '#fee2e2' : '#f3f4f6', color: overdue ? '#b91c1c' : 'var(--color-text-muted)' }}>
@@ -785,13 +750,8 @@ export default function ClientDetailPage() {
                                                 </div>
                                             </div>
 
-                                            <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                                                <button
-                                                    type="button"
-                                                    className="mv-btn-secondary"
-                                                    disabled={updatingTaskId === task.id}
-                                                    onClick={() => handleToggleTask(task.id, true)}
-                                                >
+                                            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                                                <button type="button" className="mv-btn-secondary" disabled={updatingTaskId === task.id} onClick={() => handleToggleTask(task.id, true)}>
                                                     {t.clientDetail.markDone}
                                                 </button>
                                                 <button
@@ -804,57 +764,40 @@ export default function ClientDetailPage() {
                                                     {t.clientDetail.deleteTask}
                                                 </button>
                                             </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
-                </div>
+                                        </article>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
 
-                <div>
-                    <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 14 }}>
-                        {t.clientDetail.completedTasks} ({doneTasks.length})
-                    </p>
-
-                    {doneTasks.length === 0 ? (
-                        <div className="mv-card" style={{ textAlign: 'center', color: 'var(--color-text-subtle)', fontSize: 13 }}>
-                            {language === 'ar' ? 'لا توجد مهام مكتملة بعد.' : 'No completed tasks yet.'}
-                        </div>
-                    ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                            {doneTasks.map((task) => (
-                                <div key={task.id} className="mv-card" style={{ padding: '14px 20px', opacity: 0.8 }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                    <div>
+                        <p className="cd-kicker">{t.clientDetail.completedTasks} ({doneTasks.length})</p>
+                        {doneTasks.length === 0 ? (
+                            <div className="mv-card cd-empty-block">{language === 'ar' ? 'لا توجد مهام مكتملة بعد.' : 'No completed tasks yet.'}</div>
+                        ) : (
+                            <div className="cd-stack-10">
+                                {doneTasks.map((task) => (
+                                    <article key={task.id} className="mv-card cd-task-item" style={{ opacity: 0.82 }}>
                                         <div>
-                                            <p style={{ margin: 0, fontSize: 14, color: 'var(--color-text-muted)', textDecoration: 'line-through' }}>{task.title}</p>
-                                            <p style={{ margin: '4px 0 0 0', fontSize: 11, color: 'var(--color-text-subtle)' }}>
-                                                {language === 'ar' ? 'مهمة مكتملة' : 'Completed task'}
-                                            </p>
+                                            <p className="cd-task-title" style={{ textDecoration: 'line-through', color: 'var(--color-text-muted)' }}>{task.title}</p>
+                                            <p className="cd-muted-line">{language === 'ar' ? 'مهمة مكتملة' : 'Completed task'}</p>
                                         </div>
-                                        <button
-                                            type="button"
-                                            className="mv-btn-secondary"
-                                            disabled={updatingTaskId === task.id}
-                                            onClick={() => handleToggleTask(task.id, false)}
-                                        >
+                                        <button type="button" className="mv-btn-secondary" disabled={updatingTaskId === task.id} onClick={() => handleToggleTask(task.id, false)}>
                                             {t.clientDetail.markOpen}
                                         </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
+                                    </article>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </section>
 
-                <div className="mv-card">
-                    <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 14 }}>
-                        {t.clientDetail.addNote}
-                    </p>
-
+                <section className="mv-card">
+                    <p className="cd-kicker">{t.clientDetail.addNote}</p>
                     {noteError && <div className="mv-alert-error" style={{ marginBottom: 14 }}>{noteError}</div>}
 
-                    <form onSubmit={handleAddNote} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <form onSubmit={handleAddNote} className="cd-stack-12">
                         <textarea
                             id="note-textarea"
                             value={noteContent}
@@ -869,35 +812,29 @@ export default function ClientDetailPage() {
                             </button>
                         </div>
                     </form>
-                </div>
+                </section>
 
-                <div>
-                    <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 14 }}>
-                        {t.clientDetail.notes} ({client.notes.length})
-                    </p>
+                <section>
+                    <p className="cd-kicker">{t.clientDetail.notes} ({client.notes.length})</p>
 
                     {client.notes.length === 0 ? (
-                        <div className="mv-card" style={{ textAlign: 'center', color: 'var(--color-text-subtle)', fontSize: 13 }}>
-                            {t.clientDetail.noNotes}
-                        </div>
+                        <div className="mv-card cd-empty-block">{t.clientDetail.noNotes}</div>
                     ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        <div className="cd-stack-10">
                             {client.notes.map((note, i) => (
-                                <div key={note.id} className="mv-card" style={{ padding: '16px 20px', position: 'relative' }}>
+                                <article key={note.id} className="mv-card cd-note-card">
                                     {i === 0 && (
-                                        <span className="mv-badge" style={{ position: 'absolute', top: 16, right: 20, fontSize: 10 }}>{language === 'ar' ? 'الأحدث' : 'Latest'}</span>
+                                        <span className="mv-badge" style={{ position: 'absolute', top: 16, right: 20, fontSize: 10 }}>
+                                            {language === 'ar' ? 'الأحدث' : 'Latest'}
+                                        </span>
                                     )}
-                                    <p style={{ fontSize: 14, color: 'var(--color-text)', margin: 0, whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
-                                        {note.content}
-                                    </p>
-                                    <p style={{ fontSize: 11, color: 'var(--color-text-subtle)', marginTop: 10, marginBottom: 0, letterSpacing: '0.03em' }}>
-                                        {formatDateTime(note.createdAt, locale)}
-                                    </p>
-                                </div>
+                                    <p className="cd-note-text">{note.content}</p>
+                                    <p className="cd-note-time">{formatDateTime(note.createdAt, locale)}</p>
+                                </article>
                             ))}
                         </div>
                     )}
-                </div>
+                </section>
             </main>
         </div>
     );

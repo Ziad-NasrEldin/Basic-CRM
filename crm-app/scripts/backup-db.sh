@@ -11,16 +11,16 @@ TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 BACKUP_FILE="$BACKUP_DIR/crm_db_$TIMESTAMP.sql"
 BACKUP_COMPRESSED="$BACKUP_FILE.gz"
 
-# Wait for postgres to be ready
+# Wait for postgres to be ready (connect via docker network hostname)
 echo "Waiting for PostgreSQL to be ready..."
-until pg_isready -U "$DB_USER" > /dev/null 2>&1; do
+until pg_isready -h postgres -U "$DB_USER" > /dev/null 2>&1; do
   sleep 2
 done
 
 echo "Creating database backup: $BACKUP_COMPRESSED"
 
-# Create backup
-pg_dump -U "$DB_USER" -d "$DB_NAME" > "$BACKUP_FILE"
+# Create backup (explicitly connect to postgres service)
+pg_dump -h postgres -U "$DB_USER" -d "$DB_NAME" > "$BACKUP_FILE"
 
 # Compress backup
 gzip "$BACKUP_FILE"

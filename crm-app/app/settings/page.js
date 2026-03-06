@@ -128,10 +128,13 @@ export default function SettingsPage() {
                         <div style={{ width: 1, height: 20, background: 'var(--color-border)' }} />
                         <span className="mv-page-title">{t.settings.title}</span>
                     </div>
-                    <Link href="/" className="mv-logo">
-                        <Image src="/mavoid-logo.png" alt="MaVoid" width={28} height={28} style={{ objectFit: 'contain' }} />
-                        <span className="mv-logo-word" style={{ fontSize: 15 }}>MaVoid</span>
-                    </Link>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+                        <Link href="/analytics" className="mv-back" style={{ fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.header.analytics}</Link>
+                        <Link href="/" className="mv-logo">
+                            <Image src="/mavoid-logo.png" alt="MaVoid" width={28} height={28} style={{ objectFit: 'contain' }} />
+                            <span className="mv-logo-word" style={{ fontSize: 15 }}>MaVoid</span>
+                        </Link>
+                    </div>
                 </div>
             </header>
 

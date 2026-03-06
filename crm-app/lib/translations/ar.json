@@ -4,6 +4,7 @@
   "header": {
     "crm": "نظام إدارة العملاء",
     "clients": "العملاء",
+    "analytics": "التحليلات",
     "settings": "الإعدادات"
   },
   "mainPage": {
@@ -151,5 +152,21 @@
     "back": "إلى الخلف",
     "search": "البحث",
     "deleteConfirm": "هل أنت متأكد؟ لا يمكن التراجع عن ذلك."
+  },
+  "analytics": {
+    "title": "التحليلات",
+    "totalSaleValue": "إجمالي قيمة المبيعات",
+    "totalReceived": "إجمالي المستلم",
+    "totalRemaining": "إجمالي المتبقي",
+    "avgPerMonth": "المتوسط شهرياً",
+    "monthlyRevenue": "الإيرادات الشهرية",
+    "clientsWithSales": "عملاء لديهم مبيعات",
+    "monthsActive": "أشهر نشطة",
+    "collected": "تم تحصيله",
+    "average": "متوسط",
+    "payment": "دفعة",
+    "payments": "دفعات",
+    "viewDetails": "عرض تفاصيل الدفعات",
+    "noPayments": "لم يتم تسجيل أي دفعات بعد"
   }
 }

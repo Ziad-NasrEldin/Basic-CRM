@@ -398,6 +398,7 @@ export default function ClientDetailPage() {
                         <span className="mv-page-title">{language === 'ar' ? 'تفاصيل العميل' : 'Client Details'}</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+                        <Link href="/analytics" className="mv-back" style={{ fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.header.analytics}</Link>
                         <Link href="/settings" className="mv-back" style={{ fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.header.settings}</Link>
                         <Link href="/" className="mv-logo">
                             <Image src="/mavoid-logo.png" alt="MaVoid" width={28} height={28} style={{ objectFit: 'contain' }} />

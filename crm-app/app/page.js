@@ -187,6 +187,7 @@ export default function ClientsPage() {
                         >
                             {language === 'en' ? 'العربية' : 'English'}
                         </button>
+                        <Link href="/analytics" className="mv-back" style={{ fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.header.analytics}</Link>
                         <Link href="/settings" className="mv-back" style={{ fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.header.settings}</Link>
                         <button onClick={handleExportToExcel} className="mv-btn-secondary">
                             📊 {t.mainPage.exportToExcel}

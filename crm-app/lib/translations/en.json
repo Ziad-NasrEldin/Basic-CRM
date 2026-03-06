@@ -4,6 +4,7 @@
   "header": {
     "crm": "Basic CRM",
     "clients": "Clients",
+    "analytics": "Analytics",
     "settings": "Settings"
   },
   "mainPage": {
@@ -151,5 +152,21 @@
     "back": "Back",
     "search": "Search",
     "deleteConfirm": "Are you sure? This cannot be undone."
+  },
+  "analytics": {
+    "title": "Analytics",
+    "totalSaleValue": "Total Sale Value",
+    "totalReceived": "Total Received",
+    "totalRemaining": "Total Remaining",
+    "avgPerMonth": "Avg. Per Month",
+    "monthlyRevenue": "Monthly Revenue",
+    "clientsWithSales": "clients with sales",
+    "monthsActive": "months active",
+    "collected": "collected",
+    "average": "average",
+    "payment": "payment",
+    "payments": "payments",
+    "viewDetails": "View payment details",
+    "noPayments": "No payments recorded yet"
   }
 }

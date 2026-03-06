@@ -1,78 +1,44 @@
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: crm-app-db
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${DB_NAME:-crm_db}
-      POSTGRES_USER: ${DB_USER:-crm_user}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-crm1234}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./scripts/01-init-db.sql:/docker-entrypoint-initdb.d/01-init-db.sql
-    networks:
-      - crm-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-crm_user} -d ${DB_NAME:-crm_db}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   crm-app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: crm-app
     restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
     environment:
       NODE_ENV: production
-      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_URL: file:/data/crm.db
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-}
       NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3092}
     ports:
       - "3092:3000"
-    networks:
-      - crm-network
+    volumes:
+      - sqlite_data:/data
     command: sh -c "npm run prisma:migrate && npm start"
 
-  # Daily backup service - keeps 30 days of backups
+  # Daily backup service - copies SQLite file, keeps 30 days
   backup:
-    image: postgres:16-alpine
+    image: alpine:3.19
     container_name: crm-app-backup
     restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      DB_USER: ${DB_USER:-crm_user}
-      DB_NAME: ${DB_NAME:-crm_db}
-      PGPASSWORD: ${DB_PASSWORD:-crm1234}
     volumes:
+      - sqlite_data:/data:ro
       - backups:/backups
       - ./scripts/backup-db.sh:/usr/local/bin/backup-db.sh
-    networks:
-      - crm-network
     entrypoint: /bin/sh -c 'chmod +x /usr/local/bin/backup-db.sh && while true; do /usr/local/bin/backup-db.sh; sleep 86400; done'
     profiles:
       - production
 
 volumes:
-  # ⚠️  WARNING: NEVER use "docker compose down -v" or "docker volume rm crm-app_postgres_data"
-  # This volume contains ALL your production data. Use backups for maintenance operations.
+  # ⚠️  WARNING: NEVER use "docker compose down -v" or "docker volume rm crm-app_sqlite_data"
+  # This volume contains ALL your production data.
   # To safely restart: use "docker compose restart" or "docker compose up -d"
-  postgres_data:
-    driver: local
-  
-  # Persistent backup volume - separate from postgres_data
-  # Backups are automatically created daily and stored here for 30 days
-  # Restore: docker compose exec postgres psql -U crm_user -d crm_db < /backups/crm_db_YYYYMMDD_HHMMSS.sql
-  backups:
+  sqlite_data:
     driver: local
 
-networks:
-  crm-network:
-    driver: bridge
+  # Persistent backup volume - separate from sqlite_data
+  # Backups are automatically created daily and stored here for 30 days
+  # Restore: cp /backups/crm_YYYYMMDD_HHMMSS.db /data/crm.db && docker compose restart crm-app
+  backups:
+    driver: local
     

@@ -95,6 +95,9 @@ export default function ClientsPage() {
                                         Phone
                                     </th>
                                     <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
+                                        Status
+                                    </th>
+                                    <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
                                         Product
                                     </th>
                                     <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
@@ -122,6 +125,22 @@ export default function ClientsPage() {
                                             </Link>
                                         </td>
                                         <td style={{ padding: '14px 20px', color: 'var(--color-text-muted)' }}>{client.phoneNumber}</td>
+                                        <td style={{ padding: '14px 20px', color: 'var(--color-text-muted)' }}>
+                                            {client.status ? (
+                                                <span 
+                                                    className="mv-badge" 
+                                                    style={{ 
+                                                        background: client.status.color + '20', 
+                                                        color: client.status.color,
+                                                        border: `1px solid ${client.status.color}40`
+                                                    }}
+                                                >
+                                                    {client.status.name}
+                                                </span>
+                                            ) : (
+                                                <span style={{ color: 'var(--color-text-subtle)' }}>—</span>
+                                            )}
+                                        </td>
                                         <td style={{ padding: '14px 20px', color: 'var(--color-text-muted)' }}>
                                             {client.product ? (
                                                 <span className="mv-badge" style={{ background: '#f3f4f6', color: 'var(--color-text-muted)' }}>

@@ -17,14 +17,24 @@ model Product {
   clients   Client[]
 }
 
+model ClientStatus {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  color     String   @default("#6B7280")
+  createdAt DateTime @default(now())
+  clients   Client[]
+}
+
 model Client {
-  id          Int      @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   fullName    String
   phoneNumber String
   productId   Int?
-  product     Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  product     Product?      @relation(fields: [productId], references: [id], onDelete: SetNull)
+  statusId    Int?
+  status      ClientStatus? @relation(fields: [statusId], references: [id], onDelete: SetNull)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
   notes       Note[]
 }
 

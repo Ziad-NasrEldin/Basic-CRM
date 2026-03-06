@@ -11,14 +11,21 @@ export default function NewClientPage() {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [productId, setProductId] = useState('');
     const [products, setProducts] = useState([]);
+    const [statusId, setStatusId] = useState('');
+    const [statuses, setStatuses] = useState([]);
 
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
 
     useEffect(() => {
-        fetch('/api/products')
-            .then(res => res.json())
-            .then(data => setProducts(data))
+        Promise.all([
+            fetch('/api/products').then(res => res.json()),
+            fetch('/api/client-statuses').then(res => res.json())
+        ])
+            .then(([productsData, statusesData]) => {
+                setProducts(productsData);
+                setStatuses(statusesData);
+            })
             .catch(console.error);
     }, []);
 
@@ -33,7 +40,7 @@ export default function NewClientPage() {
             const res = await fetch('/api/clients', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ fullName, phoneNumber, productId }),
+                body: JSON.stringify({ fullName, phoneNumber, productId, statusId }),
             });
             const data = await res.json();
             if (!res.ok) { setError(data.error || 'Failed to create client.'); return; }
@@ -122,6 +129,29 @@ export default function NewClientPage() {
                             {products.length === 0 && (
                                 <p style={{ margin: '6px 0 0 0', fontSize: 11, color: 'var(--color-text-subtle)' }}>
                                     No products found. <Link href="/settings" style={{ color: 'var(--color-primary)' }}>Manage products in Settings</Link>.
+                                </p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label htmlFor="status" className="mv-label">
+                                Client Status (Optional)
+                            </label>
+                            <select
+                                id="status"
+                                value={statusId}
+                                onChange={(e) => setStatusId(e.target.value)}
+                                className="mv-input"
+                                style={{ appearance: 'none', background: '#fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 20 20\' fill=\'%236B7280\'%3E%3Cpath fill-rule=\'evenodd\' d=\'M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z\' clip-rule=\'evenodd\'/%3E%3C/svg%3E") no-repeat right 12px center / 16px 16px', paddingRight: 40 }}
+                            >
+                                <option value="">Select a status...</option>
+                                {statuses.map(s => (
+                                    <option key={s.id} value={s.id}>{s.name}</option>
+                                ))}
+                            </select>
+                            {statuses.length === 0 && (
+                                <p style={{ margin: '6px 0 0 0', fontSize: 11, color: 'var(--color-text-subtle)' }}>
+                                    No statuses found. <Link href="/settings" style={{ color: 'var(--color-primary)' }}>Manage statuses in Settings</Link>.
                                 </p>
                             )}
                         </div>

@@ -12,6 +12,7 @@ function formatDate(dateStr) {
 
 export default function SettingsPage() {
     const [products, setProducts] = useState([]);
+    const [statuses, setStatuses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
@@ -19,13 +20,22 @@ export default function SettingsPage() {
     const [submitting, setSubmitting] = useState(false);
     const [productError, setProductError] = useState('');
 
+    const [newStatusName, setNewStatusName] = useState('');
+    const [newStatusColor, setNewStatusColor] = useState('#6B7280');
+    const [submittingStatus, setSubmittingStatus] = useState(false);
+    const [statusError, setStatusError] = useState('');
+
     async function fetchProducts() {
         setLoading(true);
         setError('');
         try {
-            const res = await fetch('/api/products');
-            if (!res.ok) throw new Error('Failed to load products');
-            setProducts(await res.json());
+            const [productsRes, statusesRes] = await Promise.all([
+                fetch('/api/products'),
+                fetch('/api/client-statuses')
+            ]);
+            if (!productsRes.ok || !statusesRes.ok) throw new Error('Failed to load data');
+            setProducts(await productsRes.json());
+            setStatuses(await statusesRes.json());
         } catch (err) {
             setError(err.message);
         } finally {
@@ -63,6 +73,41 @@ export default function SettingsPage() {
         try {
             const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
             if (!res.ok) throw new Error('Failed to delete product');
+            fetchProducts();
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
+    async function handleAddStatus(e) {
+        e.preventDefault();
+        setStatusError('');
+        if (!newStatusName.trim()) { setStatusError('Status name is required.'); return; }
+
+        setSubmittingStatus(true);
+        try {
+            const res = await fetch('/api/client-statuses', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: newStatusName, color: newStatusColor }),
+            });
+            const data = await res.json();
+            if (!res.ok) { setStatusError(data.error || 'Failed to add status.'); return; }
+            setNewStatusName('');
+            setNewStatusColor('#6B7280');
+            fetchProducts();
+        } catch {
+            setStatusError('Something went wrong. Please try again.');
+        } finally {
+            setSubmittingStatus(false);
+        }
+    }
+
+    async function handleDeleteStatus(id) {
+        if (!confirm('Are you sure you want to delete this status? Clients with this status will lose their status.')) return;
+        try {
+            const res = await fetch(`/api/client-statuses/${id}`, { method: 'DELETE' });
+            if (!res.ok) throw new Error('Failed to delete status');
             fetchProducts();
         } catch (err) {
             alert(err.message);
@@ -134,6 +179,77 @@ export default function SettingsPage() {
                                             <td style={{ padding: '12px 16px', textAlign: 'right', width: 60 }}>
                                                 <button
                                                     onClick={() => handleDeleteProduct(product.id)}
+                                                    style={{ background: 'transparent', border: 'none', color: '#ef4444', fontSize: 12, cursor: 'pointer', outline: 'none', padding: '4px 8px', borderRadius: 4 }}
+                                                    onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
+                                                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+
+                {/* Client Status Management */}
+                <div className="mv-card">
+                    <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 14 }}>
+                        Manage Client Statuses
+                    </p>
+                    <p style={{ fontSize: 13, color: 'var(--color-text-subtle)', marginBottom: 20, lineHeight: 1.5 }}>
+                        These statuses will be available as a dropdown option when creating or editing a client. Examples: Lead, New Customer, Follow Up, Active, etc.
+                    </p>
+
+                    {statusError && <div className="mv-alert-error" style={{ marginBottom: 14 }}>{statusError}</div>}
+
+                    <form onSubmit={handleAddStatus} style={{ display: 'flex', gap: 10, marginBottom: 24 }}>
+                        <input
+                            type="text"
+                            value={newStatusName}
+                            onChange={(e) => setNewStatusName(e.target.value)}
+                            placeholder="E.g. Lead, New Customer, Follow Up"
+                            className="mv-input"
+                            style={{ flex: 1 }}
+                        />
+                        <input
+                            type="color"
+                            value={newStatusColor}
+                            onChange={(e) => setNewStatusColor(e.target.value)}
+                            title="Choose a color for this status"
+                            style={{ width: 60, height: 42, border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', cursor: 'pointer' }}
+                        />
+                        <button type="submit" disabled={submittingStatus} className="mv-btn-primary">
+                            {submittingStatus ? 'Adding...' : 'Add Status'}
+                        </button>
+                    </form>
+
+                    <hr className="mv-divider" style={{ marginBottom: 24 }} />
+
+                    {loading ? (
+                        <div style={{ color: 'var(--color-text-subtle)', fontSize: 13, textAlign: 'center' }}>Loading statuses...</div>
+                    ) : statuses.length === 0 ? (
+                        <div style={{ color: 'var(--color-text-subtle)', fontSize: 13, textAlign: 'center' }}>No statuses added yet. Add your first one above.</div>
+                    ) : (
+                        <div style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                                <tbody>
+                                    {statuses.map((status, i) => (
+                                        <tr key={status.id} style={{ borderBottom: i < statuses.length - 1 ? '1px solid var(--color-border)' : 'none' }}>
+                                            <td style={{ padding: '12px 16px' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                                    <div style={{ width: 12, height: 12, borderRadius: '50%', background: status.color }} />
+                                                    <span style={{ fontWeight: 600, color: 'var(--color-text)' }}>{status.name}</span>
+                                                </div>
+                                            </td>
+                                            <td style={{ padding: '12px 16px', color: 'var(--color-text-subtle)', textAlign: 'right', fontSize: 12 }}>
+                                                {formatDate(status.createdAt)}
+                                            </td>
+                                            <td style={{ padding: '12px 16px', textAlign: 'right', width: 60 }}>
+                                                <button
+                                                    onClick={() => handleDeleteStatus(status.id)}
                                                     style={{ background: 'transparent', border: 'none', color: '#ef4444', fontSize: 12, cursor: 'pointer', outline: 'none', padding: '4px 8px', borderRadius: 4 }}
                                                     onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
                                                     onMouseLeave={e => e.currentTarget.style.background = 'transparent'}

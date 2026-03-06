@@ -14,7 +14,10 @@ export async function GET(request) {
                     ],
                 }
                 : undefined,
-            include: { product: true },
+            include: { 
+                product: true,
+                status: true
+            },
             orderBy: { createdAt: 'desc' },
         });
         return Response.json(clients);
@@ -27,7 +30,7 @@ export async function GET(request) {
 export async function POST(request) {
     try {
         const body = await request.json();
-        const { fullName, phoneNumber, productId } = body;
+        const { fullName, phoneNumber, productId, statusId } = body;
 
         if (!fullName || !fullName.trim()) {
             return Response.json({ error: 'Full name is required' }, { status: 400 });
@@ -41,8 +44,12 @@ export async function POST(request) {
                 fullName: fullName.trim(),
                 phoneNumber: phoneNumber.trim(),
                 productId: productId ? parseInt(productId) : null,
+                statusId: statusId ? parseInt(statusId) : null,
             },
-            include: { product: true },
+            include: { 
+                product: true,
+                status: true
+            },
         });
 
         return Response.json(client, { status: 201 });

@@ -26,6 +26,9 @@ export default function ClientDetailPage() {
     const [noteContent, setNoteContent] = useState('');
     const [submittingNote, setSubmittingNote] = useState(false);
     const [noteError, setNoteError] = useState('');
+    const [statuses, setStatuses] = useState([]);
+    const [editingStatus, setEditingStatus] = useState(false);
+    const [selectedStatusId, setSelectedStatusId] = useState('');
 
     async function fetchClient() {
         setLoading(true);
@@ -43,6 +46,13 @@ export default function ClientDetailPage() {
     }
 
     useEffect(() => { fetchClient(); }, [id]); // eslint-disable-line
+
+    useEffect(() => {
+        fetch('/api/client-statuses')
+            .then(res => res.json())
+            .then(data => setStatuses(data))
+            .catch(console.error);
+    }, []);
 
     async function handleAddNote(e) {
         e.preventDefault();
@@ -64,6 +74,21 @@ export default function ClientDetailPage() {
             setNoteError('Something went wrong. Please try again.');
         } finally {
             setSubmittingNote(false);
+        }
+    }
+
+    async function handleUpdateStatus(newStatusId) {
+        try {
+            const res = await fetch(`/api/clients/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ statusId: newStatusId || null }),
+            });
+            if (!res.ok) throw new Error('Failed to update status');
+            await fetchClient();
+            setEditingStatus(false);
+        } catch (err) {
+            alert(err.message);
         }
     }
 
@@ -128,7 +153,83 @@ export default function ClientDetailPage() {
                         </div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                        <span className="mv-badge">Active</span>
+                        {editingStatus ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
+                                <select
+                                    value={selectedStatusId}
+                                    onChange={(e) => setSelectedStatusId(e.target.value)}
+                                    className="mv-input"
+                                    style={{ 
+                                        fontSize: 13, 
+                                        padding: '6px 32px 6px 10px',
+                                        minWidth: 150,
+                                        appearance: 'none', 
+                                        background: '#fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 20 20\' fill=\'%236B7280\'%3E%3Cpath fill-rule=\'evenodd\' d=\'M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z\' clip-rule=\'evenodd\'/%3E%3C/svg%3E") no-repeat right 8px center / 14px 14px'
+                                    }}
+                                >
+                                    <option value="">No Status</option>
+                                    {statuses.map(s => (
+                                        <option key={s.id} value={s.id}>{s.name}</option>
+                                    ))}
+                                </select>
+                                <div style={{ display: 'flex', gap: 6 }}>
+                                    <button
+                                        onClick={() => handleUpdateStatus(selectedStatusId)}
+                                        className="mv-btn-primary"
+                                        style={{ fontSize: 12, padding: '5px 12px' }}
+                                    >
+                                        Save
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setEditingStatus(false);
+                                            setSelectedStatusId(client.statusId || '');
+                                        }}
+                                        className="mv-btn-secondary"
+                                        style={{ fontSize: 12, padding: '5px 12px' }}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div>
+                                {client.status ? (
+                                    <span 
+                                        className="mv-badge" 
+                                        style={{ 
+                                            background: client.status.color + '20', 
+                                            color: client.status.color,
+                                            border: `1px solid ${client.status.color}40`,
+                                            cursor: 'pointer'
+                                        }}
+                                        onClick={() => {
+                                            setEditingStatus(true);
+                                            setSelectedStatusId(client.statusId || '');
+                                        }}
+                                        title="Click to change status"
+                                    >
+                                        {client.status.name} ✏️
+                                    </span>
+                                ) : (
+                                    <button
+                                        onClick={() => {
+                                            setEditingStatus(true);
+                                            setSelectedStatusId('');
+                                        }}
+                                        className="mv-badge"
+                                        style={{ 
+                                            background: '#f3f4f6', 
+                                            color: 'var(--color-text-muted)',
+                                            cursor: 'pointer',
+                                            border: 'none'
+                                        }}
+                                    >
+                                        + Add Status
+                                    </button>
+                                )}
+                            </div>
+                        )}
                         <p style={{ fontSize: 12, color: 'var(--color-text-subtle)', marginTop: 6, marginBottom: 0 }}>
                             Since {formatDate(client.createdAt)}
                         </p>

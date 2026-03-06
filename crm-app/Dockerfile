@@ -41,6 +41,10 @@ RUN addgroup -g 1001 -S nodejs && \
 # Allow runtime cache writes (e.g., /app/.next/cache/images) for next/image
 RUN chown -R nextjs:nodejs /app
 
+# Create /data directory for SQLite and set ownership before switching user
+# Docker will preserve these permissions when mounting the named volume
+RUN mkdir -p /data && chown nextjs:nodejs /data
+
 USER nextjs
 
 EXPOSE 3000

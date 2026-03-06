@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTranslation } from '@/lib/TranslationContext';
+import * as XLSX from 'xlsx';
 
 function formatDate(dateStr, locale = 'en-US') {
     return new Date(dateStr).toLocaleDateString(locale, {
@@ -108,6 +109,48 @@ export default function ClientsPage() {
         }
     }
 
+    function handleExportToExcel() {
+        if (clients.length === 0) {
+            alert(language === 'ar' ? 'لا توجد بيانات للتصدير' : 'No data to export');
+            return;
+        }
+
+        // Prepare data for Excel
+        const excelData = clients.map((client) => ({
+            [t.mainPage.table.name]: client.fullName,
+            [t.mainPage.table.phone]: client.phoneNumber,
+            [t.mainPage.table.status]: client.status?.name || (language === 'ar' ? 'لا توجد حالة' : 'No Status'),
+            [t.mainPage.table.product]: client.product?.name || '-',
+            [t.mainPage.table.tasks]: client.tasks?.length || 0,
+            [t.mainPage.table.since]: formatDate(client.createdAt, locale),
+        }));
+
+        // Create workbook and worksheet
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(excelData);
+
+        // Set column widths
+        const colWidths = [
+            { wch: 25 }, // Name
+            { wch: 20 }, // Phone
+            { wch: 20 }, // Status
+            { wch: 20 }, // Product
+            { wch: 10 }, // Tasks
+            { wch: 15 }, // Since
+        ];
+        ws['!cols'] = colWidths;
+
+        // Add worksheet to workbook
+        XLSX.utils.book_append_sheet(wb, ws, language === 'ar' ? 'العملاء' : 'Clients');
+
+        // Generate filename with current date
+        const today = new Date().toISOString().split('T')[0];
+        const filename = `${language === 'ar' ? 'قائمة_العملاء' : 'Clients_Export'}_${today}.xlsx`;
+
+        // Download file
+        XLSX.writeFile(wb, filename);
+    }
+
     const boardColumns = [
         ...statuses.map((status) => ({
             key: `status-${status.id}`,
@@ -145,6 +188,9 @@ export default function ClientsPage() {
                             {language === 'en' ? 'العربية' : 'English'}
                         </button>
                         <Link href="/settings" className="mv-back" style={{ fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.header.settings}</Link>
+                        <button onClick={handleExportToExcel} className="mv-btn-secondary">
+                            📊 {t.mainPage.exportToExcel}
+                        </button>
                         <Link href="/clients/new" id="create-client-btn" className="mv-btn-primary">
                             + {t.mainPage.newClient}
                         </Link>

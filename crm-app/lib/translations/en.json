@@ -18,6 +18,7 @@
     "noClients": "No clients yet",
     "addClientPrompt": "Get started by adding your first client",
     "newClient": "New Client",
+    "exportToExcel": "Export to Excel",
     "table": {
       "name": "Name",
       "phone": "Phone",

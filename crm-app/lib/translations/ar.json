@@ -18,6 +18,7 @@
     "noClients": "لم يتم إضافة عملاء بعد",
     "addClientPrompt": "ابدأ بإضافة عميلك الأول",
     "newClient": "عميل جديد",
+    "exportToExcel": "تصدير إلى Excel",
     "table": {
       "name": "الاسم",
       "phone": "الهاتف",

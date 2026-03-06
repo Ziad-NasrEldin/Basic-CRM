@@ -17,6 +17,7 @@ export function TranslationProvider({ children }) {
       setLanguage(savedLanguage);
       document.documentElement.dir = savedLanguage === 'ar' ? 'rtl' : 'ltr';
       document.documentElement.lang = savedLanguage;
+      document.documentElement.style.fontFamily = savedLanguage === 'ar' ? '"Cairo", sans-serif' : '"Josefin Sans", sans-serif';
     }
     setMounted(true);
   }, []);
@@ -27,6 +28,7 @@ export function TranslationProvider({ children }) {
     localStorage.setItem('preferredLanguage', newLanguage);
     document.documentElement.dir = newLanguage === 'ar' ? 'rtl' : 'ltr';
     document.documentElement.lang = newLanguage;
+    document.documentElement.style.fontFamily = newLanguage === 'ar' ? '"Cairo", sans-serif' : '"Josefin Sans", sans-serif';
   };
 
   const translations = language === 'ar' ? arTranslations : enTranslations;

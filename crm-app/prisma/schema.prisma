@@ -36,6 +36,7 @@ model Client {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   notes       Note[]
+  tasks       Task[]
 }
 
 model Note {
@@ -44,4 +45,18 @@ model Note {
   content   String
   createdAt DateTime @default(now())
   client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}
+
+model Task {
+  id          Int      @id @default(autoincrement())
+  clientId    Int
+  title       String
+  description String?
+  dueAt       DateTime?
+  remindAt    DateTime?
+  priority    String   @default("medium")
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
 }

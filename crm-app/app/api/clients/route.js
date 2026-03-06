@@ -16,7 +16,12 @@ export async function GET(request) {
                 : undefined,
             include: { 
                 product: true,
-                status: true
+                status: true,
+                tasks: {
+                    where: { completed: false },
+                    select: { id: true, dueAt: true, priority: true },
+                    orderBy: { dueAt: 'asc' },
+                },
             },
             orderBy: { createdAt: 'desc' },
         });

@@ -15,6 +15,13 @@ export async function GET(request, { params }) {
                 product: true,
                 status: true,
                 notes: { orderBy: { createdAt: 'desc' } },
+                tasks: {
+                    orderBy: [
+                        { completed: 'asc' },
+                        { dueAt: 'asc' },
+                        { createdAt: 'desc' },
+                    ],
+                },
             },
         });
 
@@ -54,6 +61,13 @@ export async function PATCH(request, { params }) {
                 product: true,
                 status: true,
                 notes: { orderBy: { createdAt: 'desc' } },
+                tasks: {
+                    orderBy: [
+                        { completed: 'asc' },
+                        { dueAt: 'asc' },
+                        { createdAt: 'desc' },
+                    ],
+                },
             },
         });
 

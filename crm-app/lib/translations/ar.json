@@ -70,6 +70,20 @@
     "addNote": "إضافة ملاحظة",
     "notes": "الملاحظات",
     "noNotes": "لا توجد ملاحظات بعد",
+      "payments": "المدفوعات",
+      "saleValue": "قيمة البيع",
+      "totalPaid": "إجمالي المدفوع",
+      "remaining": "المتبقي",
+      "addPayment": "إضافة دفعة",
+      "paymentAmount": "مبلغ الدفعة",
+      "paymentDate": "تاريخ الدفع",
+      "paymentNote": "ملاحظة (اختياري)",
+      "recordPayment": "تسجيل دفعة",
+      "noPayments": "لم يتم تسجيل أي دفعات",
+      "paid": "دفع",
+      "on": "في",
+      "deletePayment": "حذف",
+      "editPayment": "تعديل",
     "errors": {
       "fullNameRequired": "الاسم الكامل مطلوب.",
       "phoneRequired": "رقم الهاتف مطلوب.",
@@ -77,7 +91,11 @@
       "deleteFailed": "فشل حذف العميل",
       "taskCreationFailed": "فشل إنشاء المهمة",
       "taskDeletionFailed": "فشل حذف المهمة",
-      "noteFailed": "فشل إضافة الملاحظة"
+      "noteFailed": "فشل إضافة الملاحظة",
+      "paymentAmountRequired": "مبلغ الدفعة مطلوب",
+      "paymentDateRequired": "تاريخ الدفع مطلوب",
+      "paymentCreationFailed": "فشل تسجيل الدفعة",
+      "paymentDeletionFailed": "فشل حذف الدفعة"
     }
   },
   "settings": {
@@ -109,8 +127,11 @@
       "productOptional": "(اختياري)",
       "status": "الحالة",
       "statusOptional": "(اختياري)",
+        "saleValue": "قيمة البيع",
+        "saleValueOptional": "(اختياري)",
       "fullNamePlaceholder": "مثال: أحمد حسن",
-      "phonePlaceholder": "مثال: +20 100 000 0000"
+      "phonePlaceholder": "مثال: +20 100 000 0000",
+      "saleValuePlaceholder": "مثال: 5000"
     },
     "buttons": {
       "create": "إنشاء عميل",

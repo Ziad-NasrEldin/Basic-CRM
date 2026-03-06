@@ -33,10 +33,12 @@ model Client {
   product     Product?      @relation(fields: [productId], references: [id], onDelete: SetNull)
   statusId    Int?
   status      ClientStatus? @relation(fields: [statusId], references: [id], onDelete: SetNull)
+  saleValue   Decimal?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   notes       Note[]
   tasks       Task[]
+  payments    Payment[]
 }
 
 model Note {
@@ -59,4 +61,15 @@ model Task {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id        Int      @id @default(autoincrement())
+  clientId  Int
+  amount    Decimal
+  paidAt    DateTime
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
 }

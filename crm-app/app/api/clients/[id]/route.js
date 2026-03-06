@@ -15,6 +15,7 @@ export async function GET(request, { params }) {
                 product: true,
                 status: true,
                 notes: { orderBy: { createdAt: 'desc' } },
+                                payments: { orderBy: { paidAt: 'desc' } },
                 tasks: {
                     orderBy: [
                         { completed: 'asc' },
@@ -46,17 +47,19 @@ export async function PATCH(request, { params }) {
 
     try {
         const body = await request.json();
-        const { fullName, phoneNumber, productId, statusId } = body;
+        const { fullName, phoneNumber, productId, statusId, saleValue } = body;
 
         const updateData = {};
         if (fullName !== undefined) updateData.fullName = fullName.trim();
         if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber.trim();
         if (productId !== undefined) updateData.productId = productId ? parseInt(productId) : null;
         if (statusId !== undefined) updateData.statusId = statusId ? parseInt(statusId) : null;
+    if (saleValue !== undefined) updateData.saleValue = saleValue ? parseFloat(saleValue) : null;
 
         const client = await prisma.client.update({
             where: { id: clientId },
             data: updateData,
+                            payments: { orderBy: { paidAt: 'desc' } },
             include: {
                 product: true,
                 status: true,

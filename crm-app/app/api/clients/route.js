@@ -35,7 +35,7 @@ export async function GET(request) {
 export async function POST(request) {
     try {
         const body = await request.json();
-        const { fullName, phoneNumber, productId, statusId } = body;
+        const { fullName, phoneNumber, productId, statusId, saleValue } = body;
 
         if (!fullName || !fullName.trim()) {
             return Response.json({ error: 'Full name is required' }, { status: 400 });
@@ -50,6 +50,7 @@ export async function POST(request) {
                 phoneNumber: phoneNumber.trim(),
                 productId: productId ? parseInt(productId) : null,
                 statusId: statusId ? parseInt(statusId) : null,
+                            saleValue: saleValue ? parseFloat(saleValue) : null,
             },
             include: { 
                 product: true,

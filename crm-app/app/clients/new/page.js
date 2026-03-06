@@ -17,6 +17,7 @@ export default function NewClientPage() {
     const [products, setProducts] = useState([]);
     const [statusId, setStatusId] = useState('');
     const [statuses, setStatuses] = useState([]);
+    const [saleValue, setSaleValue] = useState('');
 
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
@@ -44,7 +45,7 @@ export default function NewClientPage() {
             const res = await fetch('/api/clients', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ fullName, phoneNumber, productId, statusId }),
+                body: JSON.stringify({ fullName, phoneNumber, productId, statusId, saleValue }),
             });
             const data = await res.json();
             if (!res.ok) { setError(data.error || t.newClient.errors.creationFailed); return; }
@@ -135,6 +136,22 @@ export default function NewClientPage() {
                                     {language === 'ar' ? 'لم يتم العثور على منتجات. ' : 'No products found. '} <Link href="/settings" style={{ color: 'var(--color-primary)' }}>{language === 'ar' ? 'إدارة المنتجات في الإعدادات' : 'Manage products in Settings'}</Link>.
                                 </p>
                             )}
+
+                                                <div>
+                                                    <label htmlFor="saleValue" className="mv-label">
+                                                        {t.newClient.form.saleValue} {t.newClient.form.saleValueOptional}
+                                                    </label>
+                                                    <input
+                                                        id="saleValue"
+                                                        type="number"
+                                                        step="0.01"
+                                                        min="0"
+                                                        value={saleValue}
+                                                        onChange={(e) => setSaleValue(e.target.value)}
+                                                        placeholder={t.newClient.form.saleValuePlaceholder}
+                                                        className="mv-input"
+                                                    />
+                                                </div>
                         </div>
 
                         <div>

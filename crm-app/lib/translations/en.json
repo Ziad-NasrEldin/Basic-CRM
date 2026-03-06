@@ -70,6 +70,20 @@
     "addNote": "Add Note",
     "notes": "Notes",
     "noNotes": "No notes yet",
+      "payments": "Payments",
+      "saleValue": "Sale Value",
+      "totalPaid": "Total Paid",
+      "remaining": "Remaining",
+      "addPayment": "Add Payment",
+      "paymentAmount": "Payment Amount",
+      "paymentDate": "Payment Date",
+      "paymentNote": "Note (optional)",
+      "recordPayment": "Record Payment",
+      "noPayments": "No payments recorded",
+      "paid": "Paid",
+      "on": "on",
+      "deletePayment": "Delete",
+      "editPayment": "Edit",
     "errors": {
       "fullNameRequired": "Full name required.",
       "phoneRequired": "Phone number required.",
@@ -77,7 +91,11 @@
       "deleteFailed": "Failed to delete client",
       "taskCreationFailed": "Failed to create task",
       "taskDeletionFailed": "Failed to delete task",
-      "noteFailed": "Failed to add note"
+      "noteFailed": "Failed to add note",
+      "paymentAmountRequired": "Payment amount is required",
+      "paymentDateRequired": "Payment date is required",
+      "paymentCreationFailed": "Failed to record payment",
+      "paymentDeletionFailed": "Failed to delete payment"
     }
   },
   "settings": {
@@ -109,8 +127,11 @@
       "productOptional": "(Optional)",
       "status": "Status",
       "statusOptional": "(Optional)",
+        "saleValue": "Sale Value",
+        "saleValueOptional": "(Optional)",
       "fullNamePlaceholder": "e.g. Ahmed Hassan",
-      "phonePlaceholder": "e.g. +20 100 000 0000"
+      "phonePlaceholder": "e.g. +20 100 000 0000",
+      "saleValuePlaceholder": "e.g. 5000"
     },
     "buttons": {
       "create": "Create Client",

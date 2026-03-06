@@ -13,6 +13,58 @@ function formatDateTime(dateStr, locale = 'en-US') {
     });
 }
 
+    async function handleAddPayment(e) {
+        e.preventDefault();
+        setPaymentError('');
+
+        if (!paymentAmount || parseFloat(paymentAmount) <= 0) {
+            setPaymentError(t.clientDetail.errors.paymentAmountRequired);
+            return;
+        }
+        if (!paymentDate) {
+            setPaymentError(t.clientDetail.errors.paymentDateRequired);
+            return;
+        }
+
+        setSubmittingPayment(true);
+        try {
+            const res = await fetch('/api/payments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    clientId: id,
+                    amount: parseFloat(paymentAmount),
+                    paidAt: paymentDate,
+                    note: paymentNote.trim() || null,
+                }),
+            });
+            if (!res.ok) throw new Error(t.clientDetail.errors.paymentCreationFailed);
+            await fetchClient();
+            setPaymentAmount('');
+            setPaymentDate('');
+            setPaymentNote('');
+        } catch (err) {
+            setPaymentError(err.message);
+        } finally {
+            setSubmittingPayment(false);
+        }
+    }
+
+    async function handleDeletePayment(paymentId) {
+        if (!confirm(t.common.deleteConfirm)) return;
+
+        setDeletingPaymentId(paymentId);
+        try {
+            const res = await fetch(`/api/payments/${paymentId}`, { method: 'DELETE' });
+            if (!res.ok) throw new Error(t.clientDetail.errors.paymentDeletionFailed);
+            await fetchClient();
+        } catch (err) {
+            alert(err.message);
+        } finally {
+            setDeletingPaymentId(null);
+        }
+    }
+
 function formatDate(dateStr, locale = 'en-US') {
     return new Date(dateStr).toLocaleDateString(locale, {
         year: 'numeric', month: 'short', day: 'numeric',
@@ -49,6 +101,7 @@ export default function ClientDetailPage() {
     const [editFullName, setEditFullName] = useState('');
     const [editPhoneNumber, setEditPhoneNumber] = useState('');
     const [editProductId, setEditProductId] = useState('');
+        const [editSaleValue, setEditSaleValue] = useState('');
     const [products, setProducts] = useState([]);
     const [submittingEdit, setSubmittingEdit] = useState(false);
     const [editError, setEditError] = useState('');
@@ -70,6 +123,13 @@ export default function ClientDetailPage() {
     const [taskError, setTaskError] = useState('');
     const [submittingTask, setSubmittingTask] = useState(false);
     const [updatingTaskId, setUpdatingTaskId] = useState(null);
+
+    const [paymentAmount, setPaymentAmount] = useState('');
+    const [paymentDate, setPaymentDate] = useState('');
+    const [paymentNote, setPaymentNote] = useState('');
+    const [submittingPayment, setSubmittingPayment] = useState(false);
+    const [paymentError, setPaymentError] = useState('');
+    const [deletingPaymentId, setDeletingPaymentId] = useState(null);
 
     async function fetchClient() {
         setLoading(true);
@@ -218,6 +278,7 @@ export default function ClientDetailPage() {
         setEditFullName(client.fullName);
         setEditPhoneNumber(client.phoneNumber);
         setEditProductId(client.productId || '');
+            setEditSaleValue(client.saleValue ? parseFloat(client.saleValue).toString() : '');
         setEditError('');
         setEditingDetails(true);
     }
@@ -244,6 +305,7 @@ export default function ClientDetailPage() {
                     fullName: editFullName.trim(),
                     phoneNumber: editPhoneNumber.trim(),
                     productId: editProductId || null,
+                                    saleValue: editSaleValue || null,
                 }),
             });
             if (!res.ok) throw new Error('Failed to update client');
@@ -359,6 +421,19 @@ export default function ClientDetailPage() {
                                         <option key={p.id} value={p.id}>{p.name}</option>
                                     ))}
                                 </select>
+
+                                                        <div>
+                                                            <label className="mv-label">{t.clientDetail.saleValue} {t.clientDetail.optional}</label>
+                                                            <input
+                                                                type="number"
+                                                                step="0.01"
+                                                                min="0"
+                                                                value={editSaleValue}
+                                                                onChange={(e) => setEditSaleValue(e.target.value)}
+                                                                className="mv-input"
+                                                                placeholder="0.00"
+                                                            />
+                                                        </div>
                             </div>
 
                             <div style={{ display: 'flex', gap: 8 }}>
@@ -392,6 +467,129 @@ export default function ClientDetailPage() {
                                         {client.product.name}
                                     </span>
                                 )}
+
+                                                {/* Payments Section */}
+                                                {client.saleValue && (
+                                                    <>
+                                                        <div className="mv-card" style={{ background: '#f0f9ff', borderColor: '#bae6fd' }}>
+                                                            <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 14 }}>
+                                                                {t.clientDetail.saleValue}
+                                                            </p>
+                                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 16 }}>
+                                                                <div>
+                                                                    <p style={{ fontSize: 11, color: 'var(--color-text-subtle)', margin: '0 0 4px 0' }}>{t.clientDetail.saleValue}</p>
+                                                                    <p style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text)', margin: 0 }}>
+                                                                        {parseFloat(client.saleValue).toLocaleString(locale, { minimumFractionDigits: 2 })}
+                                                                    </p>
+                                                                </div>
+                                                                <div>
+                                                                    <p style={{ fontSize: 11, color: 'var(--color-text-subtle)', margin: '0 0 4px 0' }}>{t.clientDetail.totalPaid}</p>
+                                                                    <p style={{ fontSize: 20, fontWeight: 700, color: '#059669', margin: 0 }}>
+                                                                        {(client.payments?.reduce((sum, p) => sum + parseFloat(p.amount), 0) || 0).toLocaleString(locale, { minimumFractionDigits: 2 })}
+                                                                    </p>
+                                                                </div>
+                                                                <div>
+                                                                    <p style={{ fontSize: 11, color: 'var(--color-text-subtle)', margin: '0 0 4px 0' }}>{t.clientDetail.remaining}</p>
+                                                                    <p style={{ fontSize: 20, fontWeight: 700, color: '#dc2626', margin: 0 }}>
+                                                                        {(parseFloat(client.saleValue) - (client.payments?.reduce((sum, p) => sum + parseFloat(p.amount), 0) || 0)).toLocaleString(locale, { minimumFractionDigits: 2 })}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="mv-card">
+                                                            <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 14 }}>
+                                                                {t.clientDetail.addPayment}
+                                                            </p>
+
+                                                            {paymentError && <div className="mv-alert-error" style={{ marginBottom: 14 }}>{paymentError}</div>}
+
+                                                            <form onSubmit={handleAddPayment} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
+                                                                    <div>
+                                                                        <label className="mv-label">{t.clientDetail.paymentAmount}</label>
+                                                                        <input
+                                                                            type="number"
+                                                                            step="0.01"
+                                                                            min="0"
+                                                                            value={paymentAmount}
+                                                                            onChange={(e) => setPaymentAmount(e.target.value)}
+                                                                            placeholder="0.00"
+                                                                            className="mv-input"
+                                                                        />
+                                                                    </div>
+                                                                    <div>
+                                                                        <label className="mv-label">{t.clientDetail.paymentDate}</label>
+                                                                        <input
+                                                                            type="datetime-local"
+                                                                            value={paymentDate}
+                                                                            onChange={(e) => setPaymentDate(e.target.value)}
+                                                                            className="mv-input"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    <label className="mv-label">{t.clientDetail.paymentNote}</label>
+                                                                    <input
+                                                                        type="text"
+                                                                        value={paymentNote}
+                                                                        onChange={(e) => setPaymentNote(e.target.value)}
+                                                                        placeholder={language === 'ar' ? 'ملاحظة عن الدفعة...' : 'Note about this payment...'}
+                                                                        className="mv-input"
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <button type="submit" disabled={submittingPayment} className="mv-btn-primary">
+                                                                        {submittingPayment ? t.clientDetail.saving : t.clientDetail.recordPayment}
+                                                                    </button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+
+                                                        <div>
+                                                            <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 14 }}>
+                                                                {t.clientDetail.payments} ({client.payments?.length || 0})
+                                                            </p>
+
+                                                            {(!client.payments || client.payments.length === 0) ? (
+                                                                <div className="mv-card" style={{ textAlign: 'center', color: 'var(--color-text-subtle)', fontSize: 13 }}>
+                                                                    {t.clientDetail.noPayments}
+                                                                </div>
+                                                            ) : (
+                                                                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                                                    {client.payments.map((payment) => (
+                                                                        <div key={payment.id} className="mv-card" style={{ padding: '16px 20px' }}>
+                                                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: 12 }}>
+                                                                                <div style={{ flex: 1 }}>
+                                                                                    <p style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#059669' }}>
+                                                                                        {parseFloat(payment.amount).toLocaleString(locale, { minimumFractionDigits: 2 })}
+                                                                                    </p>
+                                                                                    <p style={{ margin: '6px 0 0 0', fontSize: 13, color: 'var(--color-text-muted)' }}>
+                                                                                        {t.clientDetail.paid} {t.clientDetail.on} {formatDateTime(payment.paidAt, locale)}
+                                                                                    </p>
+                                                                                    {payment.note && (
+                                                                                        <p style={{ margin: '8px 0 0 0', fontSize: 13, color: 'var(--color-text)', fontStyle: 'italic' }}>
+                                                                                            {payment.note}
+                                                                                        </p>
+                                                                                    )}
+                                                                                </div>
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="mv-btn-secondary"
+                                                                                    style={{ fontSize: 12, padding: '6px 12px' }}
+                                                                                    disabled={deletingPaymentId === payment.id}
+                                                                                    onClick={() => handleDeletePayment(payment.id)}
+                                                                                >
+                                                                                    {t.clientDetail.deletePayment}
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </>
+                                                )}
                                 <span className="mv-badge" style={{ background: '#f3f4f6', color: 'var(--color-text-muted)' }}>
                                     {openTasks.length} {t.clientDetail.openTasks}
                                 </span>
